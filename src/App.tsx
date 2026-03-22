@@ -11,6 +11,8 @@ import CreateCampaignPage from '@/pages/CreateCampaignPage';
 import CampaignBuilderPage from '@/pages/CampaignBuilderPage';
 import ContactsPage from '@/pages/ContactsPage';
 import FieldsPage from '@/pages/FieldsPage';
+import AutomationsPage from '@/pages/AutomationsPage';
+import AutomationBuilderPage from '@/pages/AutomationBuilderPage';
 import NotFound from '@/pages/NotFound';
 
 const queryClient = new QueryClient();
@@ -45,7 +47,17 @@ const App = () => (
                                 path="/fields"
                                 element={<AppLayout><FieldsPage /></AppLayout>}
                             />
-                            {/* This route MUST be before any wildcard and OUTSIDE AppLayout */}
+                            {/* ── Automations ── */}
+                            <Route
+                                path="/automations"
+                                element={<AppLayout><AutomationsPage /></AppLayout>}
+                            />
+                            {/* Builder MUST be outside AppLayout (full-screen canvas) */}
+                            <Route
+                                path="/automations/:id"
+                                element={<AutomationBuilderPage />}
+                            />
+                            {/* Campaign builder — MUST be before wildcard */}
                             <Route
                                 path="/campaigns/:campaignId/content"
                                 element={<CampaignBuilderPage />}

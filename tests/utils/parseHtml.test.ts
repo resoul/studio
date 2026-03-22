@@ -85,13 +85,13 @@ describe('parseHtmlToTemplate', () => {
     describe('buttons', () => {
         it('extracts anchor with background as button', () => {
             const html = wrap(
-                '<a href="https://cta.com" style="background-color:#4F46E5;color:#FFFFFF;border-radius:6px;">Click Me</a>'
+                '<a href="https://cta.com" style="background-color:#4f46e5;color:#ffffff;border-radius:6px;">Click Me</a>'
             );
             const block = parseHtmlToTemplate(html).rows[0].blocks[0][0] as ButtonBlock;
             expect(block.type).toBe('button');
             expect(block.url).toBe('https://cta.com');
-            expect(block.bgColor).toBe('#4F46E5');
-            expect(block.textColor).toBe('#FFFFFF');
+            expect(block.bgColor).toBe('#4f46e5');
+            expect(block.textColor).toBe('#ffffff');
             expect(block.borderRadius).toBe(6);
         });
 

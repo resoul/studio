@@ -20,6 +20,21 @@ function styleValue(style: CSSStyleDeclaration | null, prop: string): string {
     return style.getPropertyValue(prop).trim();
 }
 
+/**
+ * Converts an `rgb(r, g, b)` string to its `#rrggbb` hex equivalent.
+ * Returns the input unchanged when it is already in hex or any other format.
+ * JSDOM normalises inline hex colours to rgb() when reading el.style, so we
+ * always normalise back to hex so callers get stable, predictable values.
+ */
+function normalizeColor(color: string): string {
+    const match = color.match(/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+    if (!match) return color;
+    const r = parseInt(match[1], 10).toString(16).padStart(2, '0');
+    const g = parseInt(match[2], 10).toString(16).padStart(2, '0');
+    const b = parseInt(match[3], 10).toString(16).padStart(2, '0');
+    return `#${r}${g}${b}`;
+}
+
 function inlineStyleValue(el: Element, prop: string): string {
     const raw = (el as HTMLElement).style?.getPropertyValue(prop)?.trim();
     if (raw) return raw;
@@ -42,14 +57,14 @@ function resolveAlign(el: Element): 'left' | 'center' | 'right' {
 
 function resolveColor(el: Element, fallback = '#0F172A'): string {
     const c = inlineStyleValue(el, 'color');
-    return c || fallback;
+    return c ? normalizeColor(c) : fallback;
 }
 
 function resolveBgColor(el: Element, fallback = '#F8FAFC'): string {
     const c = inlineStyleValue(el, 'background-color') || inlineStyleValue(el, 'background');
     // Skip "transparent" and empty
     if (!c || c === 'transparent' || c === 'initial' || c === 'inherit') return fallback;
-    return c;
+    return normalizeColor(c);
 }
 
 function hasBackground(el: Element): boolean {
@@ -68,12 +83,17 @@ function hasMeaningfulText(el: Element): boolean {
 }
 
 /**
- * Returns true if `el` is a layout wrapper (table/tr/td/div/section)
+ * Returns true if `el` is a layout wrapper (table/tr/td/div/section/a)
  * rather than a content leaf.
+ * Note: <a> is included so we recurse into anchor-wrapped images.
  */
 function isLayoutNode(el: Element): boolean {
     const tag = el.tagName.toLowerCase();
-    return ['table', 'tbody', 'thead', 'tfoot', 'tr', 'td', 'th', 'div', 'section', 'article', 'main', 'center'].includes(tag);
+    return [
+        'table', 'tbody', 'thead', 'tfoot', 'tr', 'td', 'th',
+        'div', 'section', 'article', 'main', 'center',
+        'a',  // recurse into anchors so wrapped <img> tags are found
+    ].includes(tag);
 }
 
 // ---------------------------------------------------------------------------
@@ -126,8 +146,10 @@ function extractButton(el: Element): EmailBlock | null {
     const tag = el.tagName.toLowerCase();
     if (tag !== 'a') return null;
 
-    const bgColor = inlineStyleValue(el, 'background-color') || inlineStyleValue(el, 'background');
-    if (!bgColor || bgColor === 'transparent') return null;
+    const rawBg = inlineStyleValue(el, 'background-color') || inlineStyleValue(el, 'background');
+    if (!rawBg || rawBg === 'transparent') return null;
+
+    const bgColor = normalizeColor(rawBg);
 
     return {
         id: uid(),
@@ -157,7 +179,7 @@ function extractDivider(el: Element): EmailBlock | null {
         ? styleAttr
         : 'solid') as 'solid' | 'dashed' | 'dotted';
 
-    return { id: uid(), type: 'divider', color, thickness, style };
+    return { id: uid(), type: 'divider', color: normalizeColor(color), thickness, style };
 }
 
 function extractSpacer(el: Element): EmailBlock | null {
@@ -362,7 +384,7 @@ export function parseHtmlToTemplate(html: string): EmailTemplate {
                 continue;
             }
 
-            // Recurse into layout containers
+            // Recurse into layout containers (including <a> so wrapped images are found)
             if (isLayoutNode(child) && child.children.length > 0) {
                 processSubtree(child);
             }

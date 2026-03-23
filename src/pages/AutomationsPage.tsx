@@ -8,55 +8,21 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AutomationSummary, AutomationStatus, RecipeTemplate } from '@/types/automation';
+import { WORKFLOW_GRAPH_PRESETS } from '@/data/workflow-graphs';
 
 // ── Mock data ────────────────────────────────────────────────────────────────
 
-const MOCK_AUTOMATIONS: AutomationSummary[] = [
-    {
-        id: '1',
-        name: 'Welcome Series',
-        status: 'active',
-        trigger: 'List signup',
-        enrolled: 1240,
-        completed: 820,
-        emailsSent: 3200,
-        openRate: 48.2,
-        createdAt: '2025-01-15',
-    },
-    {
-        id: '2',
-        name: 'Post-purchase Follow-up',
-        status: 'active',
-        trigger: 'Tag: purchased',
-        enrolled: 340,
-        completed: 290,
-        emailsSent: 680,
-        openRate: 41.5,
-        createdAt: '2025-02-03',
-    },
-    {
-        id: '3',
-        name: 'Win-back Campaign',
-        status: 'paused',
-        trigger: 'Inactive 90 days',
-        enrolled: 2890,
-        completed: 1200,
-        emailsSent: 5800,
-        openRate: 22.1,
-        createdAt: '2025-02-18',
-    },
-    {
-        id: '4',
-        name: 'Birthday Greetings',
-        status: 'draft',
-        trigger: 'Date field: birthday',
-        enrolled: 0,
-        completed: 0,
-        emailsSent: 0,
-        openRate: 0,
-        createdAt: '2025-03-10',
-    },
-];
+const MOCK_AUTOMATIONS: AutomationSummary[] = WORKFLOW_GRAPH_PRESETS.map((preset) => ({
+    id: preset.id,
+    name: preset.name,
+    status: preset.status,
+    trigger: preset.trigger,
+    enrolled: preset.enrolled,
+    completed: preset.completed,
+    emailsSent: preset.emailsSent,
+    openRate: preset.openRate,
+    createdAt: '2026-03-23',
+}));
 
 const RECIPES: RecipeTemplate[] = [
     {
@@ -328,9 +294,9 @@ export default function AutomationsPage() {
             {/* ── Page header ── */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-border shrink-0">
                 <div>
-                    <h1 className="text-lg font-semibold text-foreground">Automations</h1>
+                    <h1 className="text-lg font-semibold text-foreground">Workflow Graphs</h1>
                     <p className="text-sm text-muted-foreground mt-0.5">
-                        Build triggered email workflows that run on autopilot.
+                        Open any graph to inspect and edit it in the workflow canvas.
                     </p>
                 </div>
                 <Button
@@ -339,7 +305,7 @@ export default function AutomationsPage() {
                     size="sm"
                 >
                     <Plus className="h-3.5 w-3.5" />
-                    New automation
+                    New graph
                 </Button>
             </div>
 
@@ -347,7 +313,7 @@ export default function AutomationsPage() {
 
                 {/* ── KPI strip ── */}
                 <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                    <KpiCard icon={ToggleLeft}  label="Active automations" value={activeCount} sub={`of ${automations.length} total`} />
+                    <KpiCard icon={ToggleLeft}  label="Active graphs" value={activeCount} sub={`of ${automations.length} total`} />
                     <KpiCard icon={Users}   label="Contacts enrolled" value={totalEnrolled.toLocaleString()} />
                     <KpiCard icon={Send}    label="Emails sent (all-time)" value={totalSent.toLocaleString()} />
                     <KpiCard icon={TrendingUp} label="Avg. open rate" value={avgOpenRate + '%'} sub="across active flows" />
@@ -358,8 +324,8 @@ export default function AutomationsPage() {
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                             <Sparkles className="h-4 w-4 text-accent" />
-                            <h2 className="text-sm font-semibold text-foreground">Quick-start recipes</h2>
-                            <span className="text-xs text-muted-foreground">— pre-built automations ready to launch</span>
+                            <h2 className="text-sm font-semibold text-foreground">Quick-start templates</h2>
+                            <span className="text-xs text-muted-foreground">— start from a ready graph</span>
                         </div>
                         <button
                             onClick={() => setShowRecipes(v => !v)}
@@ -378,10 +344,10 @@ export default function AutomationsPage() {
                     )}
                 </div>
 
-                {/* ── Automation list ── */}
+                {/* ── Workflow list ── */}
                 <div>
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-sm font-semibold text-foreground">Your automations</h2>
+                        <h2 className="text-sm font-semibold text-foreground">Your workflow graphs</h2>
                         <span className="text-xs text-muted-foreground tabular-nums">{automations.length} flow{automations.length !== 1 ? 's' : ''}</span>
                     </div>
 
@@ -390,11 +356,11 @@ export default function AutomationsPage() {
                             <div className="rounded-full bg-secondary p-4 mb-4">
                                 <Zap className="h-8 w-8 text-muted-foreground" />
                             </div>
-                            <p className="text-sm font-semibold text-foreground mb-1">No automations yet</p>
-                            <p className="text-xs text-muted-foreground mb-4">Start with a recipe or build from scratch.</p>
+                            <p className="text-sm font-semibold text-foreground mb-1">No workflow graphs yet</p>
+                            <p className="text-xs text-muted-foreground mb-4">Start with a template or create from scratch.</p>
                             <Button size="sm" onClick={handleNew}>
                                 <Plus className="h-3.5 w-3.5 mr-1.5" />
-                                Create automation
+                                Create graph
                             </Button>
                         </div>
                     ) : (

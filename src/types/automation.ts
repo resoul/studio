@@ -7,31 +7,42 @@ export type TriggerType =
     | 'email_clicked'
     | 'date_field'
     | 'api_call'
-    | 'purchase';
+    | 'purchase'
+    | 'manual';
+
+export type WorkflowActionType =
+    | 'send_email'
+    | 'webhook'
+    | 'update_contact'
+    | 'add_to_list'
+    | 'tag'
+    | 'ai_task';
 
 export type FlowNodeType =
     | 'trigger'
-    | 'email'
+    | 'action'
     | 'delay'
-    | 'condition'
-    | 'tag'
+    | 'match'
     | 'end';
 
-export interface NodePosition { x: number; y: number; }
+export interface NodePosition {
+    x: number;
+    y: number;
+}
 
 export interface TriggerNodeData {
     triggerType: TriggerType;
-    listId?: string;
-    tagName?: string;
-    fieldKey?: string;
-    label?: string;
+    label: string;
+    schedule: 'realtime' | 'hourly' | 'daily';
+    processingLimit: 'unlimited' | '100' | '1000';
 }
 
-export interface EmailNodeData {
-    subject: string;
-    preheader: string;
-    fromName: string;
-    fromEmail: string;
+export interface ActionNodeData {
+    actionType: WorkflowActionType;
+    title: string;
+    actor: string;
+    object: string;
+    description: string;
 }
 
 export interface DelayNodeData {
@@ -39,26 +50,34 @@ export interface DelayNodeData {
     unit: 'minutes' | 'hours' | 'days' | 'weeks';
 }
 
-export type ConditionField = 'opened_email' | 'clicked_link' | 'has_tag' | 'custom_field';
+export type MatchOperator =
+    | 'equals'
+    | 'not_equals'
+    | 'contains'
+    | 'starts_with'
+    | 'greater_than'
+    | 'less_than'
+    | 'exists';
 
-export interface ConditionNodeData {
-    field: ConditionField;
-    operator: 'is' | 'is_not' | 'contains';
+export interface MatchRule {
+    id: string;
+    label: string;
+    field: string;
+    operator: MatchOperator;
     value: string;
-    label?: string;
 }
 
-export interface TagNodeData {
-    action: 'add' | 'remove';
-    tagName: string;
+export interface MatchNodeData {
+    title: string;
+    rules: MatchRule[];
+    defaultLabel: string;
 }
 
 export type FlowNodeData =
     | TriggerNodeData
-    | EmailNodeData
+    | ActionNodeData
     | DelayNodeData
-    | ConditionNodeData
-    | TagNodeData
+    | MatchNodeData
     | Record<string, never>;
 
 export interface FlowNode {
@@ -72,14 +91,23 @@ export interface FlowEdge {
     id: string;
     fromNodeId: string;
     toNodeId: string;
+    branchId?: string;
     label?: string;
-    branch?: 'yes' | 'no';
+}
+
+export interface WorkflowRuntimeSettings {
+    queueMode: 'sequential' | 'parallel';
+    retries: number;
+    retryBackoff: 'fixed' | 'exponential';
+    timeoutSeconds: number;
+    paused: boolean;
 }
 
 export interface AutomationFlow {
     id: string;
     name: string;
     status: AutomationStatus;
+    runtime: WorkflowRuntimeSettings;
     nodes: FlowNode[];
     edges: FlowEdge[];
     createdAt: string;

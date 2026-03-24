@@ -14,6 +14,7 @@ import FieldsPage from '@/pages/FieldsPage';
 import AutomationsPage from '@/pages/AutomationsPage';
 import NotFound from '@/pages/NotFound';
 import WorkflowBuilderPage from "@/pages/Workflow";
+import TrackingPage from '@/pages/TrackingPage';
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,10 @@ const App = () => (
                             <Route
                                 path="/fields"
                                 element={<AppLayout><FieldsPage /></AppLayout>}
+                            />
+                            <Route
+                                path="/tracking"
+                                element={<AppLayout><TrackingPage /></AppLayout>}
                             />
                             {/* ── Automations ── */}
                             <Route

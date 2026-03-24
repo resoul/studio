@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes';
 import {
     LayoutDashboard, Send, Users, BarChart2, Settings,
     ChevronLeft, ChevronRight, Mail, FileText, Zap,
-    Bell, Sun, Moon, ChevronDown, Database,
+    Bell, Sun, Moon, ChevronDown, Database, Radio,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,9 @@ const NAV_SECTIONS: NavSection[] = [
         ]},
     { title: 'Reports', items: [
             { label: 'Analytics', to: '/analytics', icon: BarChart2 },
+        ]},
+    { title: 'Tracking', items: [
+            { label: 'Site & Events', to: '/tracking', icon: Radio },
         ]},
 ];
 

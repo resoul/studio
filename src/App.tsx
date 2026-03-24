@@ -12,6 +12,8 @@ import CampaignBuilderPage from '@/pages/CampaignBuilderPage';
 import ContactsPage from '@/pages/ContactsPage';
 import FieldsPage from '@/pages/FieldsPage';
 import AutomationsPage from '@/pages/AutomationsPage';
+import FormsPage from '@/pages/FormsPage';
+import FormBuilderPage from '@/pages/FormBuilderPage';
 import NotFound from '@/pages/NotFound';
 import WorkflowBuilderPage from "@/pages/Workflow";
 import TrackingPage from '@/pages/TrackingPage';
@@ -51,6 +53,16 @@ const App = () => (
                             <Route
                                 path="/tracking"
                                 element={<AppLayout><TrackingPage /></AppLayout>}
+                            />
+                            {/* ── Forms ── */}
+                            <Route
+                                path="/forms"
+                                element={<AppLayout><FormsPage /></AppLayout>}
+                            />
+                            {/* Form builder — MUST be outside AppLayout (full-screen canvas) */}
+                            <Route
+                                path="/forms/:id"
+                                element={<FormBuilderPage />}
                             />
                             {/* ── Automations ── */}
                             <Route

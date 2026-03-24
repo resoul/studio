@@ -5,6 +5,7 @@ import {
     LayoutDashboard, Send, Users, BarChart2, Settings,
     ChevronLeft, ChevronRight, Mail, FileText, Zap,
     Bell, Sun, Moon, ChevronDown, Database, Radio,
+    FormInput,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,7 @@ const NAV_SECTIONS: NavSection[] = [
             { label: 'All campaigns', to: '/campaigns', icon: Send },
             { label: 'Templates',     to: '/templates',  icon: FileText },
             { label: 'Automations',   to: '/automations', icon: Zap },
+            { label: 'Forms',         to: '/forms',       icon: FormInput },
         ]},
     { title: 'Contacts', items: [
             { label: 'Lists',         to: '/lists',   icon: Users },

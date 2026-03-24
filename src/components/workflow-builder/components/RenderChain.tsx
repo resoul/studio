@@ -107,19 +107,24 @@ export function RenderChain({ node, onAddTrigger, onAddAction, onDelete, onEdit 
 
     if (node.type === "ifelse") {
         const BW = 260; // branch width
-        const GAP = 80;
+        const GAP = 100;
         return (
             <>
                 <IfElseCard node={node} onDelete={() => onDelete(node.id)} onClick={() => onEdit(node)} />
                 {/* Fork lines */}
-                <div style={{ position: "relative", width: BW + GAP + BW, display: "flex", justifyContent: "center" }}>
-                    <div style={{ width: 2, background: "#cbd5e1", flexShrink: 0, alignSelf: "center", height: 20 }} />
+                <div style={{ position: "relative", width: (BW * 2) + GAP, display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <div style={{ width: 2, background: "#cbd5e1", height: 24 }} />
                     <div style={{
-                        position: "absolute", top: 20, left: BW / 2, right: BW / 2, height: 2, background: "#cbd5e1",
+                        position: "absolute", top: 24, left: BW / 2, right: BW / 2, height: 2, background: "#cbd5e1",
                     }} />
+                    {/* Vertical stubs connecting to Yes/No circles */}
+                    <div style={{ display: "flex", width: "100%", justifyContent: "space-between", padding: `0 ${BW / 2}px` }}>
+                        <div style={{ width: 2, background: "#cbd5e1", height: 16 }} />
+                        <div style={{ width: 2, background: "#cbd5e1", height: 16 }} />
+                    </div>
                 </div>
                 {/* Branch columns */}
-                <div style={{ display: "flex", gap: GAP, alignItems: "flex-start" }}>
+                <div style={{ display: "flex", gap: GAP, alignItems: "flex-start", marginTop: -2 }}>
                     {/* YES */}
                     <div style={{ width: BW, display: "flex", flexDirection: "column", alignItems: "center" }}>
                         <BranchBadge label="Yes" color="#16a34a" />

@@ -26,3 +26,37 @@ export interface ImportResult {
     skipped: number;
     errors: string[];
 }
+
+export type SegmentField = 'status' | 'tag' | 'email' | 'firstName' | 'lastName' | 'listId';
+export type SegmentOperator = 'is' | 'isNot' | 'contains' | 'notContains' | 'startsWith' | 'endsWith';
+export type SegmentLogic = 'all' | 'any';
+
+export interface SegmentCondition {
+    id: string;
+    field: SegmentField;
+    operator: SegmentOperator;
+    value: string;
+}
+
+export interface AudienceSegment {
+    id: string;
+    name: string;
+    description: string;
+    listId: string;
+    logic: SegmentLogic;
+    conditions: SegmentCondition[];
+    estimatedContacts: number;
+    updatedAt: string;
+    color: string;
+}
+
+export interface SegmentFieldConfig {
+    key: SegmentField;
+    label: string;
+    placeholder: string;
+}
+
+export interface SegmentOperatorConfig {
+    key: SegmentOperator;
+    label: string;
+}

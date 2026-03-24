@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { WorkflowNode, TriggerOption, ActionOption } from "./types";
 import { createInitial, mapNode, insertAfterNode, insertBranchStart, deleteNode, moveNode, uid } from "./utils";
 import { TRIGGERS } from "./constants";
+import { WORKFLOW_RECIPES } from "./data/recipes";
 import { ModalOverlay } from "./components/ModalShared";
 import { SidePanelButton } from "./components/SidePanelButton";
 import { RenderChain } from "./components/RenderChain";
@@ -17,8 +19,17 @@ import { ConfigureEmailModal } from "./modals/ConfigureEmailModal";
 import { ConfigureWebhookModal } from "./modals/ConfigureWebhookModal";
 
 export function WorkflowBuilder() {
+    const [searchParams] = useSearchParams();
+    const recipeId = searchParams.get("recipe");
+
     const [flow, setFlow] = useState<WorkflowNode>(createInitial());
     const [modal, setModal] = useState<any>(null);
+
+    useEffect(() => {
+        if (recipeId && WORKFLOW_RECIPES[recipeId]) {
+            setFlow(JSON.parse(JSON.stringify(WORKFLOW_RECIPES[recipeId])));
+        }
+    }, [recipeId]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -113,7 +124,7 @@ export function WorkflowBuilder() {
 
     return (
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-            <div style={{ display: "flex", flexDirection: "column", minHeight: "700px", fontFamily: "system-ui, -apple-system, sans-serif", position: "relative" }}>
+            <div style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: "system-ui, -apple-system, sans-serif", position: "relative", overflow: "hidden" }}>
                 {/* Header */}
                 <div style={{ background: "#0f172a", color: "#fff", padding: "0 20px", height: 48, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14 }}>
@@ -122,6 +133,12 @@ export function WorkflowBuilder() {
                         <span style={{ color: "#e2e8f0" }}>New Automation</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                        <button
+                            onClick={() => setModal({ type: "show_json" })}
+                            style={{ background: "#475569", color: "#fff", border: "none", padding: "4px 12px", borderRadius: 4, fontSize: 12, cursor: "pointer", fontWeight: 500 }}
+                        >
+                            Save
+                        </button>
                         <span style={{ fontSize: 12, color: "#64748b" }}>Saved</span>
                         <div style={{ display: "flex", borderRadius: 20, overflow: "hidden", border: "1px solid #334155" }}>
                             <button style={{ padding: "5px 14px", fontSize: 12, background: "#16a34a", color: "#fff", border: "none", cursor: "pointer", fontWeight: 500 }}>Active</button>
@@ -132,7 +149,7 @@ export function WorkflowBuilder() {
 
                 {/* Canvas */}
                 <div style={{
-                    flex: 1, minHeight: 640,
+                    flex: 1,
                     background: "#f0f4f8",
                     backgroundImage: "radial-gradient(circle, #c8d6e5 1.5px, transparent 1.5px)",
                     backgroundSize: "24px 24px",
@@ -140,7 +157,7 @@ export function WorkflowBuilder() {
                     padding: "60px 40px 80px", overflow: "auto", gap: 24,
                 }}>
                     {/* Main flow column */}
-                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", minWidth: 800 }}>
                         <RenderChain
                             node={flow}
                             onAddTrigger={openAddTrigger}
@@ -206,6 +223,26 @@ export function WorkflowBuilder() {
                                 onBack={() => setModal(modal.node ? null : { type: "add_action", ctx: modal.ctx })}
                                 onClose={closeModal}
                             />
+                        )}
+                        {modal.type === "show_json" && (
+                            <div style={{ padding: 24, minWidth: 500 }}>
+                                <h3 style={{ margin: "0 0 16px", fontSize: 16 }}>Workflow Configuration (JSON)</h3>
+                                <pre style={{
+                                    background: "#f1f5f9", padding: 16, borderRadius: 8,
+                                    fontSize: 12, overflow: "auto", maxHeight: 400,
+                                    border: "1px solid #e2e8f0"
+                                }}>
+                                    {JSON.stringify(flow, null, 2)}
+                                </pre>
+                                <div style={{ marginTop: 20, display: "flex", justifyContent: "flex-end" }}>
+                                    <button
+                                        onClick={closeModal}
+                                        style={{ background: "#3b82f6", color: "#fff", border: "none", padding: "8px 20px", borderRadius: 6, cursor: "pointer" }}
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
                         )}
                     </ModalOverlay>
                 )}

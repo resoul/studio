@@ -7,6 +7,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@packages/*": [
+        "./packages/*"
       ]
     },
     "skipLibCheck": true,

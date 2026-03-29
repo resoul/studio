@@ -1,20 +1,20 @@
 import { EmailTemplate, EmailBlock, EmailRow } from '@/types/email-builder';
 import { getGoogleFontHrefForFamily } from '@/config/email-fonts';
-import { exportHeadingHtml }         from '@/components/email-builder/blocks/heading';
-import { exportTextHtml }            from '@/components/email-builder/blocks/text';
-import { exportImageHtml }           from '@/components/email-builder/blocks/image';
-import { exportButtonHtml }          from '@/components/email-builder/blocks/button';
-import { exportDividerHtml }         from '@/components/email-builder/blocks/divider';
-import { exportSpacerHtml }          from '@/components/email-builder/blocks/spacer';
-import { exportHtmlBlockHtml }       from '@/components/email-builder/blocks/html';
-import { exportHeroHtml }            from '@/components/email-builder/blocks/hero';
-import { exportProductCardHtml }     from '@/components/email-builder/blocks/product-card';
-import { exportCouponHtml }          from '@/components/email-builder/blocks/coupon';
-import { exportSurveyHtml }          from '@/components/email-builder/blocks/survey';
-import { exportTimerHtml }           from '@/components/email-builder/blocks/timer';
-import { exportVideoHtml }           from '@/components/email-builder/blocks/video';
-import { exportSocialHtml }          from '@/components/email-builder/blocks/social';
-import { exportConditionalHtml }     from '@/components/email-builder/blocks/conditional';
+import { exportHeadingHtml }         from '@/modules/campaigns/components/email-builder/blocks/heading';
+import { exportTextHtml }            from '@/modules/campaigns/components/email-builder/blocks/text';
+import { exportImageHtml }           from '@/modules/campaigns/components/email-builder/blocks/image';
+import { exportButtonHtml }          from '@/modules/campaigns/components/email-builder/blocks/button';
+import { exportDividerHtml }         from '@/modules/campaigns/components/email-builder/blocks/divider';
+import { exportSpacerHtml }          from '@/modules/campaigns/components/email-builder/blocks/spacer';
+import { exportHtmlBlockHtml }       from '@/modules/campaigns/components/email-builder/blocks/html';
+import { exportHeroHtml }            from '@/modules/campaigns/components/email-builder/blocks/hero';
+import { exportProductCardHtml }     from '@/modules/campaigns/components/email-builder/blocks/product-card';
+import { exportCouponHtml }          from '@/modules/campaigns/components/email-builder/blocks/coupon';
+import { exportSurveyHtml }          from '@/modules/campaigns/components/email-builder/blocks/survey';
+import { exportTimerHtml }           from '@/modules/campaigns/components/email-builder/blocks/timer';
+import { exportVideoHtml }           from '@/modules/campaigns/components/email-builder/blocks/video';
+import { exportSocialHtml }          from '@/modules/campaigns/components/email-builder/blocks/social';
+import { exportConditionalHtml }     from '@/modules/campaigns/components/email-builder/blocks/conditional';
 
 interface ExportHtmlOptions {
     includeGoogleFonts?: boolean;

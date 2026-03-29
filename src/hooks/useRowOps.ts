@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { BlockType, ColumnLayout, EmailBlock, EmailRow, EmailTemplate } from '@/types/email-builder';
+import { ColumnLayout, EmailBlock, EmailRow, EmailTemplate } from '@/types/email-builder';
 import { uid } from '@/utils/uid';
 
 type SetTemplate = (updater: (prev: EmailTemplate) => EmailTemplate) => void;

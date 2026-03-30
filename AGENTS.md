@@ -25,75 +25,34 @@ Read and follow all conventions before making any changes.
 
 ```
 src/
+├── modules/                        # Feature-based modules
+│   ├── automations/                # Workflow Builder module
+│   │   ├── components/             # Workflow node components, modals
+│   │   ├── pages/                  # Automation-specific pages (e.g. list, builder)
+│   │   └── index.tsx               # Module entry & routing
+│   ├── campaigns/                  # Email Builder module
+│   │   ├── components/             # Email builder blocks, canvas, panels
+│   │   ├── pages/                  # Campaign-specific pages
+│   │   └── index.tsx               # Module entry & routing
+│   ├── dashboard/                  # Dashboard logic & components
+│   ├── fields/                     # Custom fields management
+│   ├── forms/                      # Forms & surveys module
+│   ├── contacts/                   # CRM & contacts management
+│   └── ...                         # Other feature modules (tags, storage, etc.)
 ├── components/
-│   ├── email-builder/                # Email Builder module
-│   │   ├── blocks/                   # One subfolder per block type
-│   │   │   └── survey/               # Survey / Rating block
-│   │   │       ├── Renderer.tsx      # Canvas preview component
-│   │   │       ├── PropsPanel.tsx    # Properties panel component
-│   │   │       ├── exportHtml.ts     # HTML export for this block
-│   │   │       └── index.ts          # Barrel export
-│   │   ├── inline-editor/            # Inline contenteditable editor + toolbar
-│   │   ├── canvas/                   # Droppable email canvas helpers
-│   │   ├── index-page/               # Index page composition helpers
-│   │   ├── properties-panel/         # PropertiesPanel sub-panels and shared controls
-│   │   ├── BlockPalette.tsx          # Left panel: draggable block buttons
-│   │   ├── BlockRenderer.tsx         # Renders any EmailBlock to JSX
-│   │   ├── BuilderHeader.tsx         # Top bar: undo/redo, view toggle, actions
-│   │   ├── Canvas.tsx                # Center: droppable email canvas
-│   │   ├── PropertiesPanel.tsx       # Right panel: block & template settings
-│   │   └── ...                       # Modals and other helpers
-│   ├── workflow-builder/             # Workflow Builder module
-│   │   ├── nodes/                    # Workflow node components
-│   │   ├── modals/                   # Node configuration modals
-│   │   ├── constants.ts              # Node types and categories
-│   │   ├── types.ts                  # Workflow types
-│   │   ├── utils.ts                  # Layout and logic helpers
-│   │   └── WorkflowBuilder.tsx       # Main builder component
-│   ├── dashboard/                    # Dashboard specific components
-│   ├── contacts/                     # Contacts management components
-│   ├── campaign-wizard/              # Campaign creation steps
-│   ├── fields/                       # Custom fields management
-│   ├── layout/                       # App shell, sidebar, navigation
-│   └── ui/                           # shadcn/ui shared components
-├── config/
-│   ├── i18n/
-│   │   ├── context.tsx               # TranslationProvider component
-│   │   ├── types.ts                  # i18n types
-│   │   └── en.ts / ru.ts / ...       # Language dictionaries
-│   ├── personalization.ts            # Merge tag variables config
-│   ├── social-networks.ts            # Social networks config
-│   ├── image-storage.ts              # Image upload & storage config
-│   └── stock-images.ts               # Predefined stock images
-├── data/
-│   └── email-templates.ts            # Starter template definitions
-├── hooks/
-│   ├── useEmailBuilder.ts            # Main email builder hook
-│   ├── useTranslation.ts             # Translation hook
-│   └── ...                           # Other focused hooks
-├── lib/
-│   └── utils.ts                      # cn() helper for Tailwind (shadcn standard)
-├── pages/
-│   ├── DashboardPage.tsx             # Dashboard overview
-│   ├── ContactsPage.tsx              # Contacts CRM
-│   ├── AutomationsPage.tsx           # Workflows list
-│   ├── CampaignBuilderPage.tsx      # Campaign creation flow
-│   ├── FieldsPage.tsx                # Custom fields settings
-│   ├── Index.tsx                     # Email Builder (original root)
-│   ├── Workflow.tsx                  # Workflow Builder root
-│   └── NotFound.tsx
-├── types/
-│   ├── email-builder.ts              # Email related types
-│   └── workflow-builder.ts           # Workflow related types
-└── utils/
-    ├── uid.ts                        # Shared unique ID generator
-    ├── exportHtml.ts                 # Email HTML export logic
-    └── ...
+│   ├── ui/                         # shadcn/ui shared primitives (radix based)
+│   └── ...                         # Shared, generic components (e.g. screen-loader)
+├── providers/                      # Global context providers (modules-provider.tsx)
+├── layout/                         # App shell, sidebar, navigation
+├── styles/                         # Global styles (index.css)
+├── config/                         # Global configs (i18n, fonts, social, etc.)
+├── hooks/                          # Global/Shared hooks
+├── data/                           # Global static data & starter templates
+├── types/                          # Global TypeScript types
+├── utils/                          # Global utility functions
+└── lib/                            # Third-party lib wrappers (e.g. utils.ts for cn)
 
-tests/
-├── setup.ts                          # Vitest setup
-├── hooks/                            # Hook tests
-└── utils/                            # Utility tests
+tests/                              # Vitest tests (mirror of src/ structure)
 ```
 
 ---
@@ -150,6 +109,12 @@ export function useTranslation() { … }
 The same rule applies to any future context + hook pair (e.g. theme, auth,
 feature flags). Always split them.
 
+### Modular Architecture
+- **Module Isolation**: Modules should be self-contained. Avoid importing components or internal logic from other modules. If logic is shared, lift it to `src/hooks`, `src/utils`, or `src/providers`.
+- **Feature Encapsulation**: Everything related to a feature (pages, sub-components, module-specific hooks/utils) should live inside its `src/modules/<name>/` directory.
+- **Routable Modules**: Each module must have an `index.tsx` that exports the module's router/routes.
+- **Standardized Page Patterns**: Pages inside modules live in `pages/<page-name>/page.tsx`. This mimics a predictable, file-system-based routing structure.
+
 ### Single source of truth for config-driven features
 - **Social networks** → `src/config/social-networks.ts` only.
   Do not hardcode network names, SVG paths, or brand colors anywhere else.
@@ -199,14 +164,11 @@ where JSDOM provides incomplete types — add `// JSDOM mock` comment on that li
 
 ### Components
 - Use **named exports** for all components (no `export default` in component files).
-- `export default` is only used in page files (`pages/`).
-- Keep components in `src/components/email-builder/` unless they are truly generic.
-- Keep large feature components split into focused modules (prefer folders like
-  `index-page/` and `properties-panel/` for page-specific or panel-specific logic).
-- Each block type that grows beyond a `case` statement belongs in its own folder
-  under `src/components/email-builder/blocks/<type>/` with `Renderer.tsx`,
-  `PropsPanel.tsx`, `exportHtml.ts`, and `index.ts`.
-- **Workflow nodes** belong in `src/components/workflow-builder/nodes/`.
+- `export default` is only used for Module entry points (`index.tsx`) and Page components (`page.tsx`).
+- Keep feature-specific components in `src/modules/<module-name>/components/`.
+- Keep generic, shared components in `src/components/`.
+- **Workflow nodes** belong in `src/modules/automations/components/workflow-builder/nodes/`.
+- **Email blocks** belong in `src/modules/campaigns/components/email-builder/blocks/`.
 - **UI primitives** (buttons, inputs, etc.) from **shadcn/ui** live in `src/components/ui/`.
   Always check `src/components/ui/` before creating a new basic UI component.
 
@@ -266,9 +228,9 @@ where JSDOM provides incomplete types — add `// JSDOM mock` comment on that li
 1. Add the type string to `WorkflowNodeType` union in `src/types/workflow-builder.ts`.
 2. Define the node data interface in the same file.
 3. Add a case in `createDefaultNode` (if exists) or equivalent factory.
-4. Create a component in `src/components/workflow-builder/nodes/` (e.g., `EmailNode.tsx`).
-5. Register the node in `src/components/workflow-builder/constants.ts` (NODE_TYPES configuration).
-6. Create/Update a configuration modal in `src/components/workflow-builder/modals/`.
+4. Create a component in `src/modules/automations/components/workflow-builder/nodes/` (e.g., `EmailNode.tsx`).
+5. Register the node in `src/modules/automations/components/workflow-builder/constants.ts` (NODE_TYPES configuration).
+6. Create/Update a configuration modal in `src/modules/automations/components/workflow-builder/modals/`.
 
 ---
 
@@ -278,18 +240,18 @@ where JSDOM provides incomplete types — add `// JSDOM mock` comment on that li
 2. Define the block interface in the same file
 3. Add it to the `EmailBlock` union
 4. Add a case in `createDefaultBlock` in `src/hooks/createDefaultBlock.ts`
-5. Create a folder `src/components/email-builder/blocks/<type>/` containing:
+5. Create a folder `src/modules/campaigns/components/email-builder/blocks/<type>/` containing:
     - `Renderer.tsx` — JSX preview for the canvas
     - `PropsPanel.tsx` — properties panel component
     - `exportHtml.ts` — email-safe HTML export function
     - `index.ts` — barrel export
-6. Add a `case` in `BlockRenderer.tsx` importing from the block folder
-7. Add a branch in `PropertiesPanel.tsx` importing from the block folder
-8. Add a `case` in `src/utils/exportHtml.ts` importing from the block folder
-9. Add an entry in `BlockPalette.tsx`
-10. Add an entry in `src/components/email-builder/index-page/block-meta.ts`
-11. Add a label in `src/components/email-builder/properties-panel/constants.ts`
-12. Add an entry to `CHILD_BLOCK_TYPES` in `properties-panel/conditional-props.tsx`
+6. Add a `case` in `src/modules/campaigns/components/email-builder/BlockRenderer.tsx`
+7. Add a branch in `src/modules/campaigns/components/email-builder/PropertiesPanel.tsx`
+8. Add a `case` in `src/utils/exportHtml.ts`
+9. Add an entry in `src/modules/campaigns/components/email-builder/BlockPalette.tsx`
+10. Add an entry in `src/modules/campaigns/components/email-builder/index-page/block-meta.ts`
+11. Add a label in `src/modules/campaigns/components/email-builder/properties-panel/constants.ts`
+12. Add an entry to `CHILD_BLOCK_TYPES` in `src/modules/campaigns/components/email-builder/properties-panel/conditional-props.tsx`
 
 ---
 
@@ -328,7 +290,7 @@ No other files need to change.
 using table-based layout for maximum email client compatibility.
 SVG icons (social block) are inlined as `<svg>` tags with stroke-based rendering.
 Each block type delegates its HTML rendering to its own `exportHtml.ts` inside
-`src/components/email-builder/blocks/<type>/`.
+`src/modules/campaigns/components/email-builder/blocks/<type>/`.
 
 ---
 

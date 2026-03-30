@@ -226,7 +226,7 @@ const NAMES = [
 ];
 const TAGS_POOL = [['workspace', 'laptop'], ['tech', 'code'], ['coffee', 'morning'], ['office', 'business'], ['team', 'people'], ['office', 'minimal'], ['meeting', 'business'], ['tech', 'circuit'], ['ai', 'robot'], ['abstract', 'purple'], ['space', 'night'], ['nature', 'forest'], ['landscape', 'water'], ['mountain', 'sunrise'], ['food', 'healthy'], ['travel', 'sky'], ['portrait', 'person'], ['lifestyle', 'coffee']];
 
-function makeUrl(id: string, w = 600, h = 400) {
+function makeUrl(id: string, w = 600) {
     return `https://images.unsplash.com/photo-${id}?w=${w}&auto=format&fit=crop`;
 }
 
@@ -234,8 +234,8 @@ const MOCK_FILES: MediaFile[] = PHOTO_IDS.map((id, i) => ({
     id: `m${i + 1}`,
     folderId: FOLDERS_FOR_FILES[i],
     name: NAMES[i],
-    url: makeUrl(id, WIDTHS[i], HEIGHTS[i]),
-    thumbUrl: makeUrl(id, 400, 280),
+    url: makeUrl(id, WIDTHS[i]),
+    thumbUrl: makeUrl(id, 400),
     type: 'image' as MediaType,
     size: SIZES[i],
     width: WIDTHS[i],

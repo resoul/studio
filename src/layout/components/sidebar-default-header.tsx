@@ -53,7 +53,11 @@ const mockWorkspaces: Workspace[] = [
   },
 ];
 
-export function SidebarDefaultHeader() {
+interface SidebarDefaultHeaderProps {
+    onSwitchToWorkspace?: () => void;
+}
+
+export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHeaderProps) {
   const { sidebarCollapse, setSidebarCollapse } = useLayout();
   const { theme, setTheme } = useTheme();
 
@@ -136,7 +140,7 @@ export function SidebarDefaultHeader() {
                 <span>New Workspace</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={onSwitchToWorkspace}>
               <Building2 className="size-4" />
               <span>Workspace Settings</span>
             </DropdownMenuItem>

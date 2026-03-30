@@ -60,20 +60,18 @@ npm run dev
 
 ```
 src/
-├── components/email-builder/
-│   ├── blocks/          # One folder per block type (Renderer, PropsPanel, exportHtml, index)
-│   ├── canvas/          # Droppable canvas helpers
-│   ├── inline-editor/   # Contenteditable rich-text editor + floating toolbar
-│   ├── index-page/      # Page-level composition (sidebar, drag preview, block meta)
-│   └── properties-panel/# Shared controls and per-block property panels
-├── config/              # Fonts, social networks, personalisation variables, i18n
-├── data/                # Starter email templates
-├── hooks/               # useEmailBuilder, useBlockOps, useRowOps, useTemplateHistory, …
-├── pages/               # Index (builder) and NotFound
-├── types/               # All TypeScript types for blocks and templates
-└── utils/               # exportHtml, parseHtml, uid, AI mocks
+├── modules/         # Feature-based modules (campaigns, automations, dashboard, etc.)
+├── components/      # Shared components (ui, screen-loader, etc.)
+├── providers/       # Global context providers (modules-provider.tsx)
+├── layout/          # App shell, sidebar, navigation
+├── styles/          # Global styles (index.css)
+├── config/          # Fonts, social networks, personalisation variables, i18n
+├── data/            # Starter email templates
+├── hooks/           # Global/Shared hooks
+├── types/           # All TypeScript types
+└── utils/           # Global utilities
 
-tests/                   # Mirror of src/ structure; run with Vitest
+tests/               # Mirror of src/ structure; run with Vitest
 ```
 
 ## Configuration

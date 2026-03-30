@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { ScreenLoader } from '@/components/screen-loader';
 
 const DashboardModule = lazy(() => import('@/modules/dashboard'));
@@ -10,11 +10,13 @@ const ListsModule = lazy(() => import('@/modules/lists'));
 const TrackingModule = lazy(() => import('@/modules/tracking'));
 const StorageModule = lazy(() => import('@/modules/storage'));
 const AutomationModule = lazy(() => import('@/modules/automations'));
-const СampaignModule = lazy(() => import('@/modules/campaigns'));
+const CampaignModule = lazy(() => import('@/modules/campaigns'));
+const ErrorModule = lazy(() => import('@/modules/errors'));
 
 export function ModulesProvider() {
     return (
         <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route
                 path="/dashboard/*"
                 element={
@@ -83,7 +85,15 @@ export function ModulesProvider() {
                 path="/campaigns/*"
                 element={
                     <Suspense fallback={<ScreenLoader />}>
-                        <СampaignModule />
+                        <CampaignModule />
+                    </Suspense>
+                }
+            />
+            <Route
+                path="*"
+                element={
+                    <Suspense fallback={<ScreenLoader />}>
+                        <ErrorModule />
                     </Suspense>
                 }
             />

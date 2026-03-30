@@ -3,7 +3,7 @@ import { DefaultLayout } from '@/layout';
 import CampaignBuilderPage from './pages/builder/page';
 import CreateCampaignPage from './pages/create/page';
 
-export default function СampaignModule() {
+export default function CampaignModule() {
     return (
         <Routes>
             <Route element={<DefaultLayout />}>

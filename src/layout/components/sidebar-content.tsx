@@ -5,16 +5,12 @@ import { SidebarWorkspace } from './sidebar-workspace';
 export function SidebarContent() {
   const [isWorkspaceMode, setIsWorkspaceMode] = useState(false);
 
-  const handleSwitchToDefault = () => {
-    setIsWorkspaceMode(false);
-  };
-
   return (
     <>
       {isWorkspaceMode ? (
-        <SidebarWorkspace onSwitchToDefault={handleSwitchToDefault} />
+        <SidebarWorkspace onSwitchToDefault={() => setIsWorkspaceMode(false)} />
       ) : (
-        <SidebarDefault />
+        <SidebarDefault onSwitchToWorkspace={() => setIsWorkspaceMode(true)} />
       )}
     </>
   );

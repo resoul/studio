@@ -61,6 +61,7 @@ import { cn } from '@/lib/utils';
 import { Content } from '@/layout/components/content';
 import { ContentHeader } from '@/layout/components/content-header';
 import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip.tsx";
+import { useSecondarySidebar } from '@/hooks/useSecondarySidebar';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -334,11 +335,10 @@ interface FolderSidebarProps {
     folders: MediaFolder[];
     selectedFolderId: string | null | 'all' | 'starred' | 'recent';
     onSelect: (id: string | null | 'all' | 'starred' | 'recent') => void;
-    onCreateFolder: () => void;
     onDeleteFolder: (id: string) => void;
 }
 
-function FolderSidebar({ folders, selectedFolderId, onSelect, onCreateFolder, onDeleteFolder }: FolderSidebarProps) {
+function FolderSidebar({ folders, selectedFolderId, onSelect, onDeleteFolder }: FolderSidebarProps) {
     const roots = folders.filter(f => f.parentId === null);
 
     const smartViews: Array<{ id: string; label: string; icon: React.ElementType; count?: number }> = [
@@ -399,17 +399,6 @@ function FolderSidebar({ folders, selectedFolderId, onSelect, onCreateFolder, on
                     })}
                 </div>
             </nav>
-
-            {/* Create folder CTA */}
-            <div className="border-t border-border px-3 py-2.5">
-                <button
-                    onClick={onCreateFolder}
-                    className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
-                >
-                    <FolderPlus className="h-3.5 w-3.5" />
-                    New folder
-                </button>
-            </div>
         </>
     );
 }
@@ -1271,24 +1260,47 @@ export default function StorageManagerPage() {
         recent: 'Recently added',
     }[selectedFolderId as string] ?? 'All files';
 
+    useSecondarySidebar({
+        header: <>
+            <div className="flex items-center justify-between grow px-4 py-3">
+                <h2 className="text-sm font-semibold text-foreground">Library</h2>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant="ghost" mode="icon" size="sm" onClick={() => setFolderModalOpen(true)}>
+                            <FolderPlus />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                        Add a new folder
+                    </TooltipContent>
+                </Tooltip>
+            </div>
+        </>,
+        content: <>
+            <FolderSidebar
+                folders={folders}
+                selectedFolderId={selectedFolderId}
+                onSelect={setSelectedFolderId}
+                onDeleteFolder={handleDeleteFolder}
+            />
+        </>,
+        footer: <>
+            <div className="shrink-0 border-t border-border flex items-center justify-center h-(--sidebar-footer-height) px-(--sidebar-space-x) overflow-hidden transition-all duration-1000 ease-in-out">
+                <Button
+                    variant="ghost"
+                    onClick={() => setFolderModalOpen(true)}
+                    className="shrink-0 transition-all duration-200 ease-in-out"
+                >
+                    <FolderPlus />
+                    <span>New folder</span>
+                </Button>
+            </div>
+        </>
+    })
+
     return (
         <>
             <ContentHeader className="space-x-2">
-                <aside className="w-64 shrink-0 border-r border-border bg-card flex flex-col overflow-hidden">
-                    <div className="flex items-center justify-between px-4 py-3">
-                        <h2 className="text-sm font-semibold text-foreground">Library</h2>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant="ghost" mode="icon" size="sm" onClick={() => setFolderModalOpen(true)}>
-                                    <FolderPlus />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">
-                                Add a new folder
-                            </TooltipContent>
-                        </Tooltip>
-                    </div>
-                </aside>
                 <div className="flex items-center justify-between bg-card grow">
                     <div className="flex items-center gap-2 min-w-0">
                         <h1 className="text-base font-semibold text-foreground shrink-0">Storage</h1>
@@ -1332,18 +1344,10 @@ export default function StorageManagerPage() {
                     </div>
                 </div>
             </ContentHeader>
+
             <div className="container-fluid">
                 <Content className="block py-0">
                     <div className="flex flex-1 overflow-hidden">
-                        <aside className="w-64 shrink-0 border-r border-border bg-card flex flex-col overflow-hidden in-data-[sidebar-collapsed]:w-[calc(16rem+36px)] transition-[width] duration-200 ease-in-out">
-                            <FolderSidebar
-                                folders={folders}
-                                selectedFolderId={selectedFolderId}
-                                onSelect={setSelectedFolderId}
-                                onCreateFolder={() => setFolderModalOpen(true)}
-                                onDeleteFolder={handleDeleteFolder}
-                            />
-                        </aside>
                         <div className="flex flex-1 flex-col overflow-hidden">
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 px-6 py-4 border-b border-border shrink-0">
                                 <KpiCard icon={Image} label="Total files" value={files.length} sub={`${filtered.length} visible`} />

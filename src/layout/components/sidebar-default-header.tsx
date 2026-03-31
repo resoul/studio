@@ -11,6 +11,7 @@ import {
   Sun,
   User,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useLayout } from './layout-context';
+import {useCallback} from "react";
 
 interface Workspace {
   id: string;
@@ -60,6 +62,8 @@ interface SidebarDefaultHeaderProps {
 export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHeaderProps) {
   const { sidebarCollapse, setSidebarCollapse } = useLayout();
   const { theme, setTheme } = useTheme();
+    const navigate = useNavigate();
+    const handleSettings   = useCallback(() => navigate('/settings/'), [navigate]);
 
   return (
     <div className="group flex justify-between items-center gap-2.5 border-b border-border h-11 lg:h-(--sidebar-header-height) shrink-0 px-2.5">
@@ -93,7 +97,7 @@ export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHead
                 <User className="size-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSettings}>
                 <Settings className="size-4" />
                 <span>Settings</span>
               </DropdownMenuItem>

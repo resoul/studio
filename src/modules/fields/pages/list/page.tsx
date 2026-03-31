@@ -1,14 +1,37 @@
 import { useState, useCallback, useMemo, ChangeEvent } from 'react';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    arrayMove,
+} from '@dnd-kit/sortable';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+
 import { CustomField, FieldEntity, FIELD_ENTITY_LABELS } from '@/types/fields';
-import { DEFAULT_FIELDS } from '@/modules/fields/components/fieldsData';
-import { FieldRow } from '@/modules/fields/components/FieldRow';
-import { CreateEditFieldModal } from '@/modules/fields/components/CreateEditFieldModal';
-import { DeleteFieldDialog } from '@/modules/fields/components/DeleteFieldDialog';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Plus, Search, Database, Users, Megaphone, Globe } from 'lucide-react';
-import { PageHeader } from './page-header';
-import { Content } from '@/layout/components/content';
+import { DEFAULT_FIELDS } from '@/mocks/fields';
+import { FieldRow }              from '@/modules/fields/components/FieldRow';
+import { CreateEditFieldModal }  from '@/modules/fields/components/CreateEditFieldModal';
+import { DeleteFieldDialog }     from '@/modules/fields/components/DeleteFieldDialog';
+import { ImportExportModal }     from '@/modules/fields/components/ImportExportModal';
+import { Input }    from '@/components/ui/input';
+import { Button }   from '@/components/ui/button';
+import { Badge }    from '@/components/ui/badge';
+import {
+    Plus, Search, Database, Users, Megaphone, Globe,
+    Download, Upload, ChevronDown, ChevronRight,
+} from 'lucide-react';
+import { PageHeader }  from './page-header';
+import { Content }     from '@/layout/components/content';
+import { cn }          from '@/lib/utils';
 
 const ENTITY_TABS: { entity: FieldEntity | 'all'; label: string; Icon: React.ElementType }[] = [
     { entity: 'all',      label: 'All fields', Icon: Database },
@@ -17,36 +40,29 @@ const ENTITY_TABS: { entity: FieldEntity | 'all'; label: string; Icon: React.Ele
     { entity: 'global',   label: 'Global',     Icon: Globe },
 ];
 
-interface ListProps {
-    fields: CustomField[];
-    onEdit:   (f: CustomField) => void;
-    onDelete: (f: CustomField) => void;
-    onMove:   (id: string, dir: 'up' | 'down') => void;
+interface GroupedListProps {
+    fields:      CustomField[];
+    onEdit:      (f: CustomField) => void;
+    onDelete:    (f: CustomField) => void;
+    onDuplicate: (f: CustomField) => void;
+    onLabelSave: (id: string, label: string) => void;
 }
 
-function FlatList({ fields, onEdit, onDelete, onMove }: ListProps) {
-    return (
-        <>
-            {fields.map((f, i) => (
-                <FieldRow
-                    key={f.id}
-                    field={f}
-                    isFirst={i === 0}
-                    isLast={i === fields.length - 1}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                    onMove={onMove}
-                />
-            ))}
-        </>
-    );
-}
+function GroupedList({ fields, onEdit, onDelete, onDuplicate, onLabelSave }: GroupedListProps) {
+    const [collapsed, setCollapsed] = useState<Set<FieldEntity>>(new Set());
 
-function GroupedList({ fields, onEdit, onDelete, onMove }: ListProps) {
+    const toggle = useCallback((entity: FieldEntity) => {
+        setCollapsed(prev => {
+            const next = new Set(prev);
+            next.has(entity) ? next.delete(entity) : next.add(entity);
+            return next;
+        });
+    }, []);
+
     const groups: Record<FieldEntity, CustomField[]> = {
-        contact:  fields.filter((f) => f.entity === 'contact'),
-        campaign: fields.filter((f) => f.entity === 'campaign'),
-        global:   fields.filter((f) => f.entity === 'global'),
+        contact:  fields.filter(f => f.entity === 'contact'),
+        campaign: fields.filter(f => f.entity === 'campaign'),
+        global:   fields.filter(f => f.entity === 'global'),
     };
 
     return (
@@ -54,30 +70,66 @@ function GroupedList({ fields, onEdit, onDelete, onMove }: ListProps) {
             {(['contact', 'campaign', 'global'] as FieldEntity[]).map((entity) => {
                 const group = groups[entity];
                 if (group.length === 0) return null;
+                const isCollapsed = collapsed.has(entity);
                 return (
                     <div key={entity} className="space-y-2">
-                        <div className="flex items-center gap-2 pt-2 first:pt-0">
+                        <button
+                            onClick={() => toggle(entity)}
+                            className="flex items-center gap-2 pt-2 first:pt-0 w-full text-left hover:opacity-80 transition-opacity"
+                        >
+                            {isCollapsed
+                                ? <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                                : <ChevronDown  className="h-3.5 w-3.5 text-muted-foreground" />
+                            }
                             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 {FIELD_ENTITY_LABELS[entity]}
                             </span>
                             <div className="flex-1 h-px bg-border" />
-                            <span className="text-xs text-muted-foreground tabular-nums">{group.length}</span>
-                        </div>
-                        {group.map((f, i) => (
-                            <FieldRow
-                                key={f.id}
-                                field={f}
-                                isFirst={i === 0}
-                                isLast={i === group.length - 1}
-                                onEdit={onEdit}
-                                onDelete={onDelete}
-                                onMove={onMove}
-                            />
-                        ))}
+                            <span className="text-xs text-muted-foreground tabular-nums mr-2">{group.length}</span>
+                        </button>
+                        {!isCollapsed && (
+                            <SortableContext items={group.map(f => f.id)} strategy={verticalListSortingStrategy}>
+                                {group.map((f) => (
+                                    <FieldRow
+                                        key={f.id}
+                                        field={f}
+                                        onEdit={onEdit}
+                                        onDelete={onDelete}
+                                        onDuplicate={onDuplicate}
+                                        onLabelSave={onLabelSave}
+                                    />
+                                ))}
+                            </SortableContext>
+                        )}
                     </div>
                 );
             })}
         </>
+    );
+}
+
+interface FlatListProps {
+    fields:      CustomField[];
+    onEdit:      (f: CustomField) => void;
+    onDelete:    (f: CustomField) => void;
+    onDuplicate: (f: CustomField) => void;
+    onLabelSave: (id: string, label: string) => void;
+}
+
+function FlatList({ fields, onEdit, onDelete, onDuplicate, onLabelSave }: FlatListProps) {
+    return (
+        <SortableContext items={fields.map(f => f.id)} strategy={verticalListSortingStrategy}>
+            {fields.map((f) => (
+                <FieldRow
+                    key={f.id}
+                    field={f}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    onDuplicate={onDuplicate}
+                    onLabelSave={onLabelSave}
+                />
+            ))}
+        </SortableContext>
     );
 }
 
@@ -88,11 +140,15 @@ function EmptyState({ query, onAdd }: { query: string; onAdd: () => void }) {
                 <Database className="h-8 w-8 text-muted-foreground" />
             </div>
             {query ? (
-                <p className="text-sm text-muted-foreground">No fields match "<span className="font-medium text-foreground">{query}</span>".</p>
+                <p className="text-sm text-muted-foreground">
+                    No fields match "<span className="font-medium text-foreground">{query}</span>".
+                </p>
             ) : (
                 <>
                     <p className="text-sm font-medium text-foreground mb-1">No fields yet</p>
-                    <p className="text-xs text-muted-foreground mb-4">Create custom fields to extend your contact and campaign data.</p>
+                    <p className="text-xs text-muted-foreground mb-4">
+                        Create custom fields to extend your contact and campaign data.
+                    </p>
                     <Button size="sm" onClick={onAdd}>
                         <Plus className="h-3.5 w-3.5 mr-1.5" />
                         Create first field
@@ -104,83 +160,113 @@ function EmptyState({ query, onAdd }: { query: string; onAdd: () => void }) {
 }
 
 export default function ListsPage() {
-    const [fields, setFields]         = useState<CustomField[]>(DEFAULT_FIELDS);
-    const [activeTab, setActiveTab]   = useState<FieldEntity | 'all'>('all');
-    const [query, setQuery]           = useState('');
+    const [fields,       setFields]       = useState<CustomField[]>(DEFAULT_FIELDS);
+    const [activeTab,    setActiveTab]    = useState<FieldEntity | 'all'>('all');
+    const [query,        setQuery]        = useState('');
+    const [activeTag,    setActiveTag]    = useState<string | null>(null);
     const [editingField, setEditingField] = useState<CustomField | null | undefined>(undefined);
-    // undefined = modal closed, null = creating new, CustomField = editing
-    const [deletingField, setDeletingField] = useState<CustomField | null>(null);
+    const [deletingField,setDeletingField]= useState<CustomField | null>(null);
+    const [importExport, setImportExport] = useState(false);
 
-    const handleQueryChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value), []);
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    );
+
+    const allTags = useMemo(() => {
+        const set = new Set<string>();
+        fields.forEach(f => f.tags?.forEach(t => set.add(t)));
+        return [...set].sort();
+    }, [fields]);
 
     const filtered = useMemo(() => {
         let list = fields;
-        if (activeTab !== 'all') list = list.filter((f) => f.entity === activeTab);
+        if (activeTab !== 'all') list = list.filter(f => f.entity === activeTab);
         if (query.trim()) {
             const q = query.toLowerCase();
-            list = list.filter(
-                (f) =>
-                    f.label.toLowerCase().includes(q) ||
-                    f.key.toLowerCase().includes(q) ||
-                    f.description.toLowerCase().includes(q),
+            list = list.filter(f =>
+                f.label.toLowerCase().includes(q) ||
+                f.key.toLowerCase().includes(q)   ||
+                f.description.toLowerCase().includes(q),
             );
         }
+        if (activeTag) {
+            list = list.filter(f => f.tags?.includes(activeTag));
+        }
         return [...list].sort((a, b) => a.order - b.order);
-    }, [fields, activeTab, query]);
+    }, [fields, activeTab, query, activeTag]);
 
     const countFor = useCallback(
         (entity: FieldEntity | 'all') =>
             entity === 'all'
                 ? fields.length
-                : fields.filter((f) => f.entity === entity).length,
+                : fields.filter(f => f.entity === entity).length,
         [fields],
     );
 
-    const existingKeys = useMemo(() => fields.map((f) => f.key), [fields]);
+    const totalUsage = useMemo(
+        () => fields.reduce((s, f) => s + (f.usageCount ?? 0), 0),
+        [fields],
+    );
+
+    const existingKeys = useMemo(() => fields.map(f => f.key), [fields]);
     const nextOrder    = useMemo(
-        () => Math.max(0, ...fields.map((f) => f.order)) + 1,
+        () => Math.max(0, ...fields.map(f => f.order)) + 1,
         [fields],
     );
 
-    // ── handlers ─────────────────────────────────────────────────────────────
+    const handleDragEnd = useCallback((event: DragEndEvent) => {
+        const { active, over } = event;
+        if (!over || active.id === over.id) return;
+
+        setFields(prev => {
+            const sorted = [...prev].sort((a, b) => a.order - b.order);
+            const oldIdx = sorted.findIndex(f => f.id === active.id);
+            const newIdx = sorted.findIndex(f => f.id === over.id);
+            if (oldIdx === -1 || newIdx === -1) return prev;
+            const reordered = arrayMove(sorted, oldIdx, newIdx);
+            return reordered.map((f, i) => ({ ...f, order: i }));
+        });
+    }, []);
 
     const handleSave = useCallback((saved: CustomField) => {
-        setFields((prev) => {
-            const idx = prev.findIndex((f) => f.id === saved.id);
-            return idx === -1 ? [...prev, saved] : prev.map((f) => (f.id === saved.id ? saved : f));
+        setFields(prev => {
+            const idx = prev.findIndex(f => f.id === saved.id);
+            return idx === -1 ? [...prev, saved] : prev.map(f => f.id === saved.id ? saved : f);
         });
         setEditingField(undefined);
     }, []);
 
     const handleDelete = useCallback((id: string) => {
-        setFields((prev) => prev.filter((f) => f.id !== id));
+        setFields(prev => prev.filter(f => f.id !== id));
         setDeletingField(null);
     }, []);
 
-    const handleMove = useCallback((id: string, dir: 'up' | 'down') => {
-        setFields((prev) => {
-            const entityFields = [...prev].sort((a, b) => a.order - b.order);
-            const idx = entityFields.findIndex((f) => f.id === id);
-            if (idx === -1) return prev;
-            const swapIdx = dir === 'up' ? idx - 1 : idx + 1;
-            if (swapIdx < 0 || swapIdx >= entityFields.length) return prev;
+    const handleDuplicate = useCallback((source: CustomField) => {
+        const now = new Date().toISOString().split('T')[0];
+        const newField: CustomField = {
+            ...source,
+            id:        `cf-dup-${Date.now()}`,
+            key:       `${source.key}_copy`,
+            label:     `${source.label} (copy)`,
+            system:    false,
+            order:     nextOrder,
+            createdAt: now,
+        };
+        setFields(prev => [...prev, newField]);
+    }, [nextOrder]);
 
-            const updated = [...entityFields];
-            const aOrder = updated[idx].order;
-            const bOrder = updated[swapIdx].order;
-            updated[idx]     = { ...updated[idx],     order: bOrder };
-            updated[swapIdx] = { ...updated[swapIdx], order: aOrder };
-
-            return prev.map((f) => {
-                const match = updated.find((u) => u.id === f.id);
-                return match ?? f;
-            });
-        });
+    const handleLabelSave = useCallback((id: string, label: string) => {
+        setFields(prev => prev.map(f => f.id === id ? { ...f, label } : f));
     }, []);
 
-    const openCreate = useCallback(() => setEditingField(null), []);
-    const openEdit   = useCallback((f: CustomField) => setEditingField(f), []);
-    const openDelete = useCallback((f: CustomField) => setDeletingField(f), []);
+    const handleImport = useCallback((imported: CustomField[]) => {
+        setFields(prev => [...prev, ...imported]);
+    }, []);
+
+    const openCreate = useCallback(() => setEditingField(null),   []);
+    const openEdit   = useCallback((f: CustomField) => setEditingField(f),   []);
+    const openDelete = useCallback((f: CustomField) => setDeletingField(f),  []);
 
     return (
         <>
@@ -194,25 +280,25 @@ export default function ListsPage() {
                             <button
                                 key={entity}
                                 onClick={() => setActiveTab(entity)}
-                                className={[
+                                className={cn(
                                     'flex items-center gap-3 px-5 py-3.5 bg-card text-left transition-colors hover:bg-secondary/40',
-                                    activeTab === entity ? 'border-b-2 border-primary' : '',
-                                ].join(' ')}
+                                    activeTab === entity && 'border-b-2 border-primary',
+                                )}
                             >
-                                <div className={[
+                                <div className={cn(
                                     'h-8 w-8 rounded-lg flex items-center justify-center shrink-0',
                                     activeTab === entity ? 'bg-primary/10' : 'bg-secondary',
-                                ].join(' ')}>
-                                    <Icon className={[
+                                )}>
+                                    <Icon className={cn(
                                         'h-4 w-4',
                                         activeTab === entity ? 'text-primary' : 'text-muted-foreground',
-                                    ].join(' ')} />
+                                    )} />
                                 </div>
                                 <div>
-                                    <p className={[
+                                    <p className={cn(
                                         'text-xl font-semibold tabular-nums leading-tight',
                                         activeTab === entity ? 'text-primary' : 'text-foreground',
-                                    ].join(' ')}>
+                                    )}>
                                         {countFor(entity)}
                                     </p>
                                     <p className="text-xs text-muted-foreground">{label}</p>
@@ -221,34 +307,91 @@ export default function ListsPage() {
                         ))}
                     </div>
 
+                    {/* Usage stat bar */}
+                    {totalUsage > 0 && (
+                        <div className="flex items-center gap-3 px-6 py-2.5 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-100 dark:border-blue-900">
+                            <Database className="h-4 w-4 text-blue-500 shrink-0" />
+                            <p className="text-sm text-blue-700 dark:text-blue-300">
+                                Your fields are used across <strong>{totalUsage.toLocaleString()}</strong> records total.
+                            </p>
+                        </div>
+                    )}
+
                     {/* Toolbar */}
-                    <div className="flex items-center gap-3 px-6 py-3 border-b border-border bg-secondary/10 shrink-0">
-                        <div className="relative max-w-xs flex-1">
+                    <div className="flex flex-wrap items-center gap-3 px-6 py-3 border-b border-border bg-secondary/10 shrink-0">
+                        <div className="relative max-w-xs flex-1 min-w-[160px]">
                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
                             <Input
                                 value={query}
-                                onChange={handleQueryChange}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
                                 placeholder="Search fields…"
                                 className="pl-8 h-8 text-sm"
                             />
                         </div>
-                        <span className="text-xs text-muted-foreground ml-auto tabular-nums">
-                    {filtered.length} field{filtered.length !== 1 ? 's' : ''}
-                </span>
+
+                        {/* Tag filter chips */}
+                        {allTags.length > 0 && (
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                                {allTags.map(tag => (
+                                    <Badge
+                                        key={tag}
+                                        variant={activeTag === tag ? 'primary' : 'secondary'}
+                                        className="cursor-pointer text-xs"
+                                        onClick={() => setActiveTag(prev => prev === tag ? null : tag)}
+                                    >
+                                        {tag}
+                                    </Badge>
+                                ))}
+                            </div>
+                        )}
+
+                        <div className="flex items-center gap-2 ml-auto">
+                            <span className="text-xs text-muted-foreground tabular-nums">
+                                {filtered.length} field{filtered.length !== 1 ? 's' : ''}
+                            </span>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setImportExport(true)}
+                            >
+                                <Download className="h-3.5 w-3.5" />
+                                <Upload  className="h-3.5 w-3.5 -ml-1" />
+                                Import / Export
+                            </Button>
+                        </div>
                     </div>
 
-                    {/* Field list */}
+                    {/* Field list with DnD */}
                     <div className="flex-1 overflow-y-auto px-6 py-4">
                         {filtered.length === 0 ? (
                             <EmptyState query={query} onAdd={openCreate} />
                         ) : (
-                            <div className="space-y-2">
-                                {/* Group by entity within "all" tab */}
-                                {activeTab === 'all'
-                                    ? <GroupedList fields={filtered} onEdit={openEdit} onDelete={openDelete} onMove={handleMove} />
-                                    : <FlatList    fields={filtered} onEdit={openEdit} onDelete={openDelete} onMove={handleMove} />
-                                }
-                            </div>
+                            <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                modifiers={[restrictToVerticalAxis]}
+                                onDragEnd={handleDragEnd}
+                            >
+                                <div className="space-y-2">
+                                    {activeTab === 'all' ? (
+                                        <GroupedList
+                                            fields={filtered}
+                                            onEdit={openEdit}
+                                            onDelete={openDelete}
+                                            onDuplicate={handleDuplicate}
+                                            onLabelSave={handleLabelSave}
+                                        />
+                                    ) : (
+                                        <FlatList
+                                            fields={filtered}
+                                            onEdit={openEdit}
+                                            onDelete={openDelete}
+                                            onDuplicate={handleDuplicate}
+                                            onLabelSave={handleLabelSave}
+                                        />
+                                    )}
+                                </div>
+                            </DndContext>
                         )}
                     </div>
 
@@ -266,6 +409,15 @@ export default function ListsPage() {
                         field={deletingField}
                         onClose={() => setDeletingField(null)}
                         onConfirm={handleDelete}
+                    />
+
+                    <ImportExportModal
+                        open={importExport}
+                        onOpenChange={setImportExport}
+                        fields={fields}
+                        existingKeys={existingKeys}
+                        nextOrder={nextOrder}
+                        onImport={handleImport}
                     />
                 </Content>
             </div>

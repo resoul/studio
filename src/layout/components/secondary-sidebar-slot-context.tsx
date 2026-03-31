@@ -14,13 +14,7 @@ interface SecondarySidebarSlotContextValue {
     isVisible: boolean;
 }
 
-const SecondarySidebarSlotContext = createContext<SecondarySidebarSlotContextValue>({
-    slots: { header: null, content: null, footer: null },
-    setHeader: () => {},
-    setContent: () => {},
-    setFooter: () => {},
-    isVisible: false,
-});
+const SecondarySidebarSlotContext = createContext<SecondarySidebarSlotContextValue | undefined>(undefined);
 
 export function SecondarySidebarSlotProvider({ children }: { children: ReactNode }) {
     const [slots, setSlots] = useState<SecondarySidebarSlots>({
@@ -30,15 +24,15 @@ export function SecondarySidebarSlotProvider({ children }: { children: ReactNode
     });
 
     const setHeader = useCallback((node: ReactNode) => {
-        setSlots((prev) => ({ ...prev, header: node }));
+        setSlots((prev) => (prev.header === node ? prev : { ...prev, header: node }));
     }, []);
 
     const setContent = useCallback((node: ReactNode) => {
-        setSlots((prev) => ({ ...prev, content: node }));
+        setSlots((prev) => (prev.content === node ? prev : { ...prev, content: node }));
     }, []);
 
     const setFooter = useCallback((node: ReactNode) => {
-        setSlots((prev) => ({ ...prev, footer: node }));
+        setSlots((prev) => (prev.footer === node ? prev : { ...prev, footer: node }));
     }, []);
 
     const isVisible = slots.header !== null || slots.content !== null || slots.footer !== null;
@@ -51,5 +45,9 @@ export function SecondarySidebarSlotProvider({ children }: { children: ReactNode
 }
 
 export function useSecondarySidebarSlot() {
-    return useContext(SecondarySidebarSlotContext);
+    const context = useContext(SecondarySidebarSlotContext);
+    if (!context) {
+        throw new Error('useSecondarySidebarSlot must be used within a SecondarySidebarSlotProvider');
+    }
+    return context;
 }

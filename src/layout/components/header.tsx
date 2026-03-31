@@ -4,6 +4,11 @@ import { HeaderHelp } from './header-help';
 import { HeaderNew } from './header-new';
 import { HeaderUpgrade } from './header-upgrade';
 import { HeaderUsers } from './header-users';
+import { ChatSheet } from './chat-sheet';
+import { NotificationsSheet } from './notifications-sheet';
+import { Bell, LayoutGrid, MessageCircleMore } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { AppsDropdownMenu } from './apps-dropdown-menu';
 
 export function Header() {
   return (
@@ -18,6 +23,40 @@ export function Header() {
           <HeaderNew />
           <Separator orientation="vertical" className="bg-zinc-600 h-4 mx-1" />
           <HeaderHelp />
+          <Separator orientation="vertical" className="bg-zinc-600 h-4 mx-1" />
+            <NotificationsSheet
+                trigger={
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-white hover:text-white hover:bg-zinc-800 hover:border-zinc-800"
+                    >
+                        <Bell className="size-4 text-white" />
+                    </Button>
+                }
+            />
+            <ChatSheet
+                trigger={
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-white hover:text-white hover:bg-zinc-800 hover:border-zinc-800"
+                    >
+                        <MessageCircleMore className="size-4 text-white" />
+                    </Button>
+                }
+            />
+          <AppsDropdownMenu
+              trigger={
+                  <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:text-white hover:bg-zinc-800 hover:border-zinc-800"
+                  >
+                      <LayoutGrid className="size-4 text-white" />
+                  </Button>
+              }
+          />
           <Separator orientation="vertical" className="bg-zinc-600 h-4 mx-1" />
           <HeaderUsers />
         </div>

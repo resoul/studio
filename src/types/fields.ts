@@ -9,7 +9,13 @@ export type FieldType =
     | 'datetime'
     | 'boolean'
     | 'select'
-    | 'multiselect';
+    | 'multiselect'
+    | 'color'
+    | 'rating'
+    | 'file'
+    | 'json'
+    | 'relation'
+    | 'formula';
 
 export type FieldEntity = 'contact' | 'campaign' | 'global';
 
@@ -17,6 +23,26 @@ export interface FieldOption {
     id: string;
     label: string;
     value: string;
+}
+
+export interface FieldValidation {
+    /** Regex pattern string for text/email/phone/url */
+    pattern?: string;
+    patternMessage?: string;
+    /** Min / max for number fields */
+    min?: number;
+    max?: number;
+    /** Allowed email domains, e.g. ['gmail.com'] */
+    allowedDomains?: string[];
+    /** Min / max dates (ISO string) */
+    minDate?: string;
+    maxDate?: string;
+    /** Rating max stars */
+    maxRating?: number;
+    /** Formula expression (for formula type) */
+    formulaExpression?: string;
+    /** Related entity for relation type */
+    relatedEntity?: FieldEntity;
 }
 
 export interface CustomField {
@@ -36,6 +62,12 @@ export interface CustomField {
     options: FieldOption[];
     order: number;
     createdAt: string;
+    /** Validation rules (optional) */
+    validation?: FieldValidation;
+    /** Usage count — how many contacts/campaigns use this field (mock) */
+    usageCount?: number;
+    /** Tags for grouping */
+    tags?: string[];
 }
 
 export const FIELD_TYPE_LABELS: Record<FieldType, string> = {
@@ -50,6 +82,12 @@ export const FIELD_TYPE_LABELS: Record<FieldType, string> = {
     boolean:     'Yes / No',
     select:      'Dropdown',
     multiselect: 'Multi-select',
+    color:       'Color',
+    rating:      'Rating',
+    file:        'File upload',
+    json:        'JSON',
+    relation:    'Relation',
+    formula:     'Formula',
 };
 
 export const FIELD_ENTITY_LABELS: Record<FieldEntity, string> = {
@@ -57,3 +95,22 @@ export const FIELD_ENTITY_LABELS: Record<FieldEntity, string> = {
     campaign: 'Campaign',
     global:   'Global',
 };
+
+export const FIELD_TYPE_GROUPS: { label: string; types: FieldType[] }[] = [
+    {
+        label: 'Text',
+        types: ['text', 'textarea', 'email', 'phone', 'url'],
+    },
+    {
+        label: 'Numbers & Choices',
+        types: ['number', 'boolean', 'select', 'multiselect', 'rating'],
+    },
+    {
+        label: 'Date & Time',
+        types: ['date', 'datetime'],
+    },
+    {
+        label: 'Advanced',
+        types: ['color', 'file', 'json', 'relation', 'formula'],
+    },
+];

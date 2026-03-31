@@ -1,8 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import type { NavItem } from '@/config/types';
 import { Ellipsis, Pin, PinOff, Plus, StickyNote } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 import {
   AccordionMenu,
   AccordionMenuItem,
@@ -73,6 +74,63 @@ function TasksDropdownMenu({ trigger }: { trigger: React.ReactNode }) {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => pinSidebarNavItem('tasks')}>
+          <PinOff />
+          <span>Unpin from sidebar</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+function StoreDropdownMenu({ trigger }: { trigger: React.ReactNode }) {
+  const { pinSidebarNavItem, sidebarCollapse } = useLayout();
+    const navigate = useNavigate();
+    const handleCustomerListDetails   = useCallback(() => navigate('/store/customer-list-details'), [navigate]);
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <div className="cursor-pointer">
+          {sidebarCollapse ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>{trigger}</span>
+              </TooltipTrigger>
+              <TooltipContent align="center" side="right" sideOffset={28}>
+                Tasks
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            trigger
+          )}
+        </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="w-56"
+        align={sidebarCollapse ? 'start' : 'start'}
+        side={sidebarCollapse ? 'right' : 'bottom'}
+        sideOffset={sidebarCollapse ? 20 : 10}
+        alignOffset={sidebarCollapse ? -7 : 5}
+      >
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <Plus />
+            <span>Add Task</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Recent</DropdownMenuLabel>
+          <DropdownMenuItem onClick={handleCustomerListDetails}>
+            <StickyNote />
+            <span>Recent 1</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <StickyNote />
+            <span>Recent 2</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => pinSidebarNavItem('store')}>
           <PinOff />
           <span>Unpin from sidebar</span>
         </DropdownMenuItem>
@@ -204,6 +262,7 @@ function NavItem({ item }: { item: NavItem }) {
           {item.more && (
             <>
               {item.id === 'tasks' && <TasksDropdownMenu trigger={trigger} />}
+              {item.id === 'store' && <StoreDropdownMenu trigger={trigger} />}
             </>
           )}
           {item.new && (

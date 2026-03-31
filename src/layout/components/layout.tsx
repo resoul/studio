@@ -4,6 +4,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Header } from './header';
 import { useLayout } from './layout-context';
 import { Sidebar } from './sidebar';
+import { Helmet } from '@packages/react-helmet-async';
 import { SecondarySidebar } from './secondary-sidebar';
 import { useSecondarySidebarSlot } from './secondary-sidebar-slot-context';
 
@@ -27,23 +28,28 @@ export function Layout() {
     };
 
     return (
-        <div {...rootProps}>
-            <Header />
-            <div className="flex flex-1">
-                {!isMobile && <Sidebar />}
-                {!isMobile && <SecondarySidebar />}
-                <main
-                    className={cn(
-                        'flex-1 flex flex-col mt-(--header-height)',
-                        'lg:mt-[calc(var(--header-height)+var(--content-header-height))]',
-                        'lg:ms-(--sidebar-width) lg:in-data-[sidebar-collapsed]:ms-(--sidebar-width-collapsed)',
-                        hasSecondarySidebar && 'lg:ps-(--secondary-sidebar-width)',
-                        'transition-[margin,padding] duration-200 ease-in-out',
-                    )}
-                >
-                    <Outlet />
-                </main>
+        <>
+            <Helmet>
+                <title>Studio - 22</title>
+            </Helmet>
+            <div {...rootProps}>
+                <Header />
+                <div className="flex flex-1">
+                    {!isMobile && <Sidebar />}
+                    {!isMobile && <SecondarySidebar />}
+                    <main
+                        className={cn(
+                            'flex-1 flex flex-col mt-(--header-height)',
+                            'lg:mt-[calc(var(--header-height)+var(--content-header-height))]',
+                            'lg:ms-(--sidebar-width) lg:in-data-[sidebar-collapsed]:ms-(--sidebar-width-collapsed)',
+                            hasSecondarySidebar && 'lg:ps-(--secondary-sidebar-width)',
+                            'transition-[margin,padding] duration-200 ease-in-out',
+                        )}
+                    >
+                        <Outlet />
+                    </main>
+                </div>
             </div>
-        </div>
+        </>
     );
 }

@@ -11,6 +11,9 @@ const TrackingModule = lazy(() => import('@/modules/tracking'));
 const StorageModule = lazy(() => import('@/modules/storage'));
 const AutomationModule = lazy(() => import('@/modules/automations'));
 const CampaignModule = lazy(() => import('@/modules/campaigns'));
+const EventsModule = lazy(() => import('@/modules/events'));
+const SettingsModule = lazy(() => import('@/modules/settings'));
+const StoreModule = lazy(() => import('@/modules/store'));
 const ErrorModule = lazy(() => import('@/modules/errors'));
 
 export function ModulesProvider() {
@@ -86,6 +89,30 @@ export function ModulesProvider() {
                 element={
                     <Suspense fallback={<ScreenLoader />}>
                         <CampaignModule />
+                    </Suspense>
+                }
+            />
+            <Route
+                path="/events/*"
+                element={
+                    <Suspense fallback={<ScreenLoader />}>
+                        <EventsModule />
+                    </Suspense>
+                }
+            />
+            <Route
+                path="/settings/*"
+                element={
+                    <Suspense fallback={<ScreenLoader />}>
+                        <SettingsModule />
+                    </Suspense>
+                }
+            />
+            <Route
+                path="/store/*"
+                element={
+                    <Suspense fallback={<ScreenLoader />}>
+                        <StoreModule />
                     </Suspense>
                 }
             />

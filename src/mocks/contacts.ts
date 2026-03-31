@@ -58,3 +58,28 @@ export const MOCK_CONTACTS: Contact[] = [
     { id: 'c12', listId: 'l4', firstName: 'Leo',     lastName: 'Jackson',   email: 'leo@example.com',      phone: '+1 555-0112', status: 'active',       addedAt: '2025-02-14', tags: ['vip'] },
     { id: 'c13', listId: 'l5', firstName: 'Maya',    lastName: 'White',     email: 'maya@example.com',     phone: '+1 555-0113', status: 'unsubscribed', addedAt: '2024-11-01', tags: [] },
 ];
+
+export const LIST_STATS: Record<string, {
+    sent: number; delivered: number; opened: number; openedUnique: number;
+    clicked: number; clickedUnique: number; unsubscribes: number;
+    complaints: number; forwards: number;
+}> = {
+    l1: { sent: 14200, delivered: 13980, opened: 3740, openedUnique: 3200, clicked: 620, clickedUnique: 510, unsubscribes: 42, complaints: 8, forwards: 120 },
+    l2: { sent: 6200, delivered: 6110, opened: 2340, openedUnique: 2100, clicked: 410, clickedUnique: 380, unsubscribes: 18, complaints: 3, forwards: 55 },
+    l3: { sent: 1100, delivered: 1095, opened: 480, openedUnique: 450, clicked: 90, clickedUnique: 80, unsubscribes: 4, complaints: 0, forwards: 12 },
+    l4: { sent: 420, delivered: 418, opened: 244, openedUnique: 230, clicked: 98, clickedUnique: 90, unsubscribes: 2, complaints: 0, forwards: 8 },
+    l5: { sent: 2800, delivered: 2710, opened: 560, openedUnique: 490, clicked: 70, clickedUnique: 60, unsubscribes: 95, complaints: 12, forwards: 18 },
+};
+
+export const LIST_HYGIENE: Record<string, {
+    listSize: number; usable: number; hardBounces: number; hygiene: number;
+    complaints: number; verified: number; verifiedPct: number;
+    spamtrap: number; catchall: number; disposable: number;
+    unsubscribes: number; bots: number; unknown: number;
+}> = {
+    l1: { listSize: 14820, usable: 13100, hardBounces: 420, hygiene: 3, complaints: 8, verified: 12600, verifiedPct: 85, spamtrap: 12, catchall: 340, disposable: 60, unsubscribes: 42, bots: 8, unknown: 80 },
+    l2: { listSize: 6340, usable: 5980, hardBounces: 120, hygiene: 2, complaints: 3, verified: 5800, verifiedPct: 92, spamtrap: 4, catchall: 110, disposable: 20, unsubscribes: 18, bots: 2, unknown: 30 },
+    l3: { listSize: 1120, usable: 1090, hardBounces: 14, hygiene: 1, complaints: 0, verified: 1060, verifiedPct: 95, spamtrap: 0, catchall: 22, disposable: 4, unsubscribes: 4, bots: 0, unknown: 6 },
+    l4: { listSize: 430, usable: 422, hardBounces: 3, hygiene: 0, complaints: 0, verified: 418, verifiedPct: 97, spamtrap: 0, catchall: 6, disposable: 1, unsubscribes: 2, bots: 0, unknown: 2 },
+    l5: { listSize: 2890, usable: 2100, hardBounces: 380, hygiene: 8, complaints: 12, verified: 2000, verifiedPct: 70, spamtrap: 28, catchall: 210, disposable: 80, unsubscribes: 95, bots: 14, unknown: 120 },
+};

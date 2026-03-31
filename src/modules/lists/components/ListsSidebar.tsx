@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Plus, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { ContactList } from '@/types/contacts';
 
 interface ListsSidebarProps {
@@ -35,15 +35,6 @@ export function ListsSidebar({ lists, selectedId, onSelect, onCreateNew }: Lists
                     />
                 ))}
             </nav>
-            <div className="border-t border-border px-3 py-3">
-                <button
-                    onClick={onCreateNew}
-                    className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-xs text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
-                >
-                    <Plus className="h-3.5 w-3.5" />
-                    New list
-                </button>
-            </div>
         </>
     );
 }

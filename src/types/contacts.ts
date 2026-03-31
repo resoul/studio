@@ -24,6 +24,7 @@ export type ContactStatus = Contact['status'];
 export interface ImportResult {
     imported: number;
     skipped: number;
+    duplicates: number;
     errors: string[];
 }
 
@@ -60,3 +61,7 @@ export interface SegmentOperatorConfig {
     key: SegmentOperator;
     label: string;
 }
+
+export type BulkAction = 'delete' | 'tag' | 'status' | 'export';
+
+export type ContactsViewMode = 'lists' | 'segments';

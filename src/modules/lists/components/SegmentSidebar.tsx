@@ -1,13 +1,12 @@
 import { useCallback } from 'react';
 import { ContactList, AudienceSegment } from '@/types/contacts';
-import { Plus, Target, Users } from 'lucide-react';
+import { Target, Users } from 'lucide-react';
 
 interface SegmentSidebarProps {
     segments: AudienceSegment[];
     lists: ContactList[];
     selectedId: string | null;
     onSelect: (id: string) => void;
-    onCreateNew: () => void;
 }
 
 function getListLabel(lists: ContactList[], listId: string): string {
@@ -18,7 +17,7 @@ function getListLabel(lists: ContactList[], listId: string): string {
     return lists.find((list) => list.id === listId)?.name ?? 'Unknown list';
 }
 
-export function SegmentSidebar({ segments, lists, selectedId, onSelect, onCreateNew }: SegmentSidebarProps) {
+export function SegmentSidebar({ segments, lists, selectedId, onSelect }: SegmentSidebarProps) {
     return (
         <>
             <nav className="flex-1 overflow-y-auto py-1.5 px-1.5 space-y-0.5">
@@ -39,15 +38,6 @@ export function SegmentSidebar({ segments, lists, selectedId, onSelect, onCreate
                     />
                 ))}
             </nav>
-            <div className="border-t border-border px-3 py-2.5">
-                <button
-                    onClick={onCreateNew}
-                    className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
-                >
-                    <Plus className="h-3.5 w-3.5" />
-                    New segment
-                </button>
-            </div>
         </>
     );
 }

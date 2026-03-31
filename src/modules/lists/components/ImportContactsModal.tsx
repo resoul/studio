@@ -1,5 +1,11 @@
 import { useState, useRef, useCallback } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Contact, ImportResult } from '@/types/contacts';
 import { FileUp, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
@@ -8,7 +14,7 @@ interface ImportContactsModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     listId: string;
-    onImported: (contacts: Contact[]) => void;
+    onImported: (contacts: Contact[]) => { imported: number; duplicates: number } | undefined;
 }
 
 function detectColumn(headers: string[], candidates: string[]): number {
@@ -19,7 +25,10 @@ function detectColumn(headers: string[], candidates: string[]): number {
     return -1;
 }
 
-function parseCsvText(text: string, listId: string): { contacts: Contact[]; skipped: number; errors: string[] } {
+function parseCsvText(
+    text: string,
+    listId: string,
+): { contacts: Contact[]; skipped: number; errors: string[] } {
     const lines = text.split(/\r?\n/).filter((l) => l.trim());
     if (lines.length < 2) return { contacts: [], skipped: 0, errors: ['File has no data rows.'] };
 
@@ -41,8 +50,11 @@ function parseCsvText(text: string, listId: string): { contacts: Contact[]; skip
 
         if (!email || !email.includes('@')) {
             skipped++;
-            if (!email) errors.push(`Row ${i + 2}: missing email — skipped`);
-            else errors.push(`Row ${i + 2}: invalid email "${email}" — skipped`);
+            errors.push(
+                email
+                    ? `Row ${i + 2}: invalid email "${email}" — skipped`
+                    : `Row ${i + 2}: missing email — skipped`,
+            );
             return;
         }
 
@@ -78,11 +90,17 @@ interface FileEntry {
     contacts?: Contact[];
 }
 
-export function ImportContactsModal({ open, onOpenChange, listId, onImported }: ImportContactsModalProps) {
+export function ImportContactsModal({
+                                        open,
+                                        onOpenChange,
+                                        listId,
+                                        onImported,
+                                    }: ImportContactsModalProps) {
     const [files, setFiles] = useState<FileEntry[]>([]);
     const [isDragging, setIsDragging] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [importDone, setImportDone] = useState(false);
+    const [totalDuplicates, setTotalDuplicates] = useState(0);
     const fileRef = useRef<HTMLInputElement>(null);
 
     const addFiles = useCallback((incoming: File[]) => {
@@ -99,11 +117,14 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
         });
     }, []);
 
-    const handleDrop = useCallback((e: React.DragEvent) => {
-        e.preventDefault();
-        setIsDragging(false);
-        addFiles(Array.from(e.dataTransfer.files));
-    }, [addFiles]);
+    const handleDrop = useCallback(
+        (e: React.DragEvent) => {
+            e.preventDefault();
+            setIsDragging(false);
+            addFiles(Array.from(e.dataTransfer.files));
+        },
+        [addFiles],
+    );
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -112,9 +133,12 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
 
     const handleDragLeave = useCallback(() => setIsDragging(false), []);
 
-    const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) addFiles(Array.from(e.target.files));
-    }, [addFiles]);
+    const handleFileInput = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (e.target.files) addFiles(Array.from(e.target.files));
+        },
+        [addFiles],
+    );
 
     const removeFile = useCallback((idx: number) => {
         setFiles((prev) => prev.filter((_, i) => i !== idx));
@@ -127,7 +151,9 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
         const allContacts: Contact[] = [];
 
         for (let i = 0; i < files.length; i++) {
-            setFiles((prev) => prev.map((e, idx) => idx === i ? { ...e, status: 'parsing' } : e));
+            setFiles((prev) =>
+                prev.map((e, idx) => (idx === i ? { ...e, status: 'parsing' } : e)),
+            );
 
             try {
                 const text = await files[i].file.text();
@@ -137,7 +163,12 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
                 setFiles((prev) =>
                     prev.map((e, idx) =>
                         idx === i
-                            ? { ...e, status: 'done', contacts, result: { imported: contacts.length, skipped, errors } }
+                            ? {
+                                ...e,
+                                status: 'done',
+                                contacts,
+                                result: { imported: contacts.length, skipped, duplicates: 0, errors },
+                            }
                             : e,
                     ),
                 );
@@ -145,7 +176,11 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
                 setFiles((prev) =>
                     prev.map((e, idx) =>
                         idx === i
-                            ? { ...e, status: 'error', result: { imported: 0, skipped: 0, errors: ['Failed to read file.'] } }
+                            ? {
+                                ...e,
+                                status: 'error',
+                                result: { imported: 0, skipped: 0, duplicates: 0, errors: ['Failed to read file.'] },
+                            }
                             : e,
                     ),
                 );
@@ -154,7 +189,11 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
 
         setIsProcessing(false);
         setImportDone(true);
-        onImported(allContacts);
+
+        const result = onImported(allContacts);
+        if (result) {
+            setTotalDuplicates(result.duplicates);
+        }
     }, [files, listId, onImported]);
 
     const handleClose = useCallback(() => {
@@ -162,7 +201,10 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
         setFiles([]);
         setImportDone(false);
         setIsProcessing(false);
+        setTotalDuplicates(0);
     }, [onOpenChange]);
+
+    const handleBrowseClick = useCallback(() => fileRef.current?.click(), []);
 
     const totalImported = files.reduce((sum, f) => sum + (f.result?.imported ?? 0), 0);
     const totalSkipped  = files.reduce((sum, f) => sum + (f.result?.skipped  ?? 0), 0);
@@ -174,6 +216,7 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
                     <DialogTitle>Import contacts</DialogTitle>
                     <DialogDescription>
                         Upload one or more CSV files. Columns detected automatically: email, first_name, last_name, phone.
+                        Duplicate emails are skipped automatically.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -184,7 +227,7 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
                             onDrop={handleDrop}
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
-                            onClick={() => fileRef.current?.click()}
+                            onClick={handleBrowseClick}
                             className={[
                                 'flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed cursor-pointer transition-colors py-8 px-4',
                                 isDragging
@@ -224,7 +267,7 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
                                             <Loader2 className="h-4 w-4 animate-spin text-primary" />
                                         )}
                                         {entry.status === 'done' && (
-                                            <CheckCircle className="h-4 w-4 text-accent" />
+                                            <CheckCircle className="h-4 w-4 text-emerald-500" />
                                         )}
                                         {entry.status === 'error' && (
                                             <AlertCircle className="h-4 w-4 text-destructive" />
@@ -240,8 +283,9 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
                                         </p>
                                         {entry.result && (
                                             <p className="text-xs text-muted-foreground mt-0.5">
-                                                {entry.result.imported} imported
-                                                {entry.result.skipped > 0 && ` · ${entry.result.skipped} skipped`}
+                                                {entry.result.imported} rows parsed
+                                                {entry.result.skipped > 0 &&
+                                                    ` · ${entry.result.skipped} skipped`}
                                             </p>
                                         )}
                                         {entry.result?.errors && entry.result.errors.length > 0 && (
@@ -275,15 +319,14 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
 
                     {/* Summary after import */}
                     {importDone && (
-                        <div className="flex items-center gap-3 rounded-lg border border-accent/30 bg-accent/5 px-4 py-3">
-                            <CheckCircle className="h-5 w-5 text-accent shrink-0" />
-                            <div>
-                                <p className="text-sm font-semibold text-foreground">
-                                    Import complete
-                                </p>
+                        <div className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/30 px-4 py-3">
+                            <CheckCircle className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                            <div className="space-y-0.5">
+                                <p className="text-sm font-semibold text-foreground">Import complete</p>
                                 <p className="text-xs text-muted-foreground">
                                     {totalImported} contacts added
-                                    {totalSkipped > 0 && ` · ${totalSkipped} skipped`}
+                                    {totalSkipped > 0 && ` · ${totalSkipped} invalid rows skipped`}
+                                    {totalDuplicates > 0 && ` · ${totalDuplicates} duplicates skipped`}
                                 </p>
                             </div>
                         </div>
@@ -298,8 +341,12 @@ export function ImportContactsModal({ open, onOpenChange, listId, onImported }: 
                                 onClick={handleImport}
                                 disabled={files.length === 0 || isProcessing}
                             >
-                                {isProcessing && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-                                {isProcessing ? 'Importing…' : `Import ${files.length > 0 ? `(${files.length} file${files.length > 1 ? 's' : ''})` : ''}`}
+                                {isProcessing && (
+                                    <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                                )}
+                                {isProcessing
+                                    ? 'Importing…'
+                                    : `Import${files.length > 0 ? ` (${files.length} file${files.length > 1 ? 's' : ''})` : ''}`}
                             </Button>
                         )}
                     </div>

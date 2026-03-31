@@ -87,6 +87,20 @@ export const MAIN_NAV: NavConfig = [
         },
     },
     {
+        icon: CheckSquare,
+        title: 'Store',
+        path: '/store/order-list',
+        pinnable: true,
+        pinned: true,
+        badge: '3',
+        id: 'store',
+        more: true,
+        new: {
+            tooltip: 'New Order',
+            path: '/store/order-list/new',
+        },
+    },
+    {
         icon: GalleryVerticalEnd,
         title: 'Notes',
         path: '/dashboard/notes',

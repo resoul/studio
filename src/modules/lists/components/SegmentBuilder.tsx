@@ -2,7 +2,7 @@ import { useCallback, ChangeEvent } from 'react';
 import { AudienceSegment, Contact, ContactList, SegmentCondition, SegmentField, SegmentOperator } from '@/types/contacts';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { SEGMENT_FIELD_CONFIG, SEGMENT_OPERATOR_CONFIG } from '@/modules/lists/components/segmentsData';
+import { SEGMENT_FIELD_CONFIG, SEGMENT_OPERATOR_CONFIG } from '@/mocks/segments';
 import { Plus, Trash2, Target, Users } from 'lucide-react';
 
 interface SegmentBuilderProps {

@@ -9,6 +9,7 @@ import {
   Plus,
   Settings,
   Sun,
+    Globe,
   User,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -23,9 +24,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu';
 import { useLayout } from './layout-context';
 import {useCallback} from "react";
+import {Language} from "@/config/i18n/types.ts";
+import {useTranslation} from "@/hooks/useTranslation.tsx";
+import { toAbsoluteUrl } from '@/lib/helpers';
+import { Badge } from '@/components/ui/badge';
 
 interface Workspace {
   id: string;
@@ -59,11 +69,22 @@ interface SidebarDefaultHeaderProps {
     onSwitchToWorkspace?: () => void;
 }
 
+const LANGUAGE_OPTIONS: { code: Language; flag: string; label: string }[] = [
+    { code: 'en', flag: toAbsoluteUrl('/media/flags/united-states.svg'), label: 'English' },
+    { code: 'ru', flag: toAbsoluteUrl('/media/flags/russia.svg'), label: 'Русский' },
+    { code: 'uk', flag: toAbsoluteUrl('/media/flags/ukraine.svg'), label: 'Українська' },
+    { code: 'it', flag: toAbsoluteUrl('/media/flags/italy.svg'), label: 'Italiano' },
+    { code: 'es', flag: toAbsoluteUrl('/media/flags/spain.svg'), label: 'Español' },
+    { code: 'fr', flag: toAbsoluteUrl('/media/flags/france.svg'), label: 'Français' },
+];
+
 export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHeaderProps) {
   const { sidebarCollapse, setSidebarCollapse } = useLayout();
   const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
     const handleSettings   = useCallback(() => navigate('/settings/'), [navigate]);
+    const { t, language, setLanguage } = useTranslation();
+    const currentLang = LANGUAGE_OPTIONS.find(l => l.code === language);
 
   return (
     <div className="group flex justify-between items-center gap-2.5 border-b border-border h-11 lg:h-(--sidebar-header-height) shrink-0 px-2.5">
@@ -75,10 +96,10 @@ export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHead
               className="flex items-center justify-between gap-2.5 px-1.5 hover:bg-accent -ms-0.5"
             >
               <span className="rounded-md bg-emerald-500 text-white text-sm shrink-0 size-6 flex items-center justify-center">
-                K
+                S
               </span>
               <span className="text-foreground text-sm font-medium in-data-[sidebar-collapsed]:hidden">
-                Keenthemes
+                Studio
               </span>
               <ChevronDown className="size-4 text-muted-foreground in-data-[sidebar-collapsed]:hidden" />
             </Button>
@@ -91,7 +112,7 @@ export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHead
             alignOffset={0}
           >
             {/* Account Section */}
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{t('sidebar.my.account')}</DropdownMenuLabel>
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <User className="size-4" />
@@ -101,6 +122,51 @@ export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHead
                 <Settings className="size-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
+                <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="flex items-center gap-2 [&_[data-slot=dropdown-menu-sub-trigger-indicator]]:hidden hover:[&_[data-slot=badge]]:border-input data-[state=open]:[&_[data-slot=badge]]:border-input">
+                        <Globe />
+                        <span className="flex items-center justify-between gap-2 grow relative">
+                          Language
+                          <Badge
+                              variant="outline"
+                              className="absolute end-0 top-1/2 -translate-y-1/2"
+                          >
+                            {currentLang?.label}
+                              <img
+                                  src={currentLang?.flag}
+                                  className="w-3.5 h-3.5 rounded-full"
+                                  alt={currentLang?.label}
+                              />
+                          </Badge>
+                        </span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent className="w-48">
+                        <DropdownMenuRadioGroup
+                            value={currentLang?.code}
+                            onValueChange={(value) => {
+                                const selectedLang = LANGUAGE_OPTIONS.find(
+                                    (lang) => lang.code === value,
+                                );
+                                if (selectedLang) setLanguage(selectedLang.code);
+                            }}
+                        >
+                            {LANGUAGE_OPTIONS.map((item) => (
+                                <DropdownMenuRadioItem
+                                    key={item.code}
+                                    value={item.code}
+                                    className="flex items-center gap-2"
+                                >
+                                    <img
+                                        src={item.flag}
+                                        className="w-4 h-4 rounded-full"
+                                        alt={item.label}
+                                    />
+                                    <span>{item.label}</span>
+                                </DropdownMenuRadioItem>
+                            ))}
+                        </DropdownMenuRadioGroup>
+                    </DropdownMenuSubContent>
+                </DropdownMenuSub>
               <DropdownMenuItem>
                 <Crown className="size-4" />
                 <span>Upgrade</span>

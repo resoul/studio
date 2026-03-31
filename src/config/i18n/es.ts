@@ -1,6 +1,8 @@
 import { TranslationDictionary } from './types';
 
 export const es: TranslationDictionary = {
+    'sidebar.my.account': 'Mi cuenta',
+
     'header.preview': 'Vista previa',
     'header.export': 'Exportar',
     'header.desktopView': 'Escritorio',

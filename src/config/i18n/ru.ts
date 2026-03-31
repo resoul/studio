@@ -1,6 +1,8 @@
 import { TranslationDictionary } from './types';
 
 export const ru: TranslationDictionary = {
+    'sidebar.my.account': 'Мой аккаунт',
+
     'header.preview': 'Предпросмотр',
     'header.export': 'Экспорт',
     'header.desktopView': 'Для ПК',

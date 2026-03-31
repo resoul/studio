@@ -1,6 +1,8 @@
 import { TranslationDictionary } from './types';
 
 export const uk: TranslationDictionary = {
+    'sidebar.my.account': 'Мій акаунт',
+
     'header.preview': 'Перегляд',
     'header.export': 'Експорт',
     'header.desktopView': 'Для ПК',

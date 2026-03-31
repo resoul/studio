@@ -159,7 +159,6 @@ where JSDOM provides incomplete types — add `// JSDOM mock` comment on that li
 
 ### View mode (Desktop / Mobile)
 - `viewMode` state lives in `Index.tsx` and is passed down as a prop.
-- The toggle UI renders in `BuilderHeader.tsx` (center slot).
 - `Canvas.tsx` receives `viewMode` as a prop — it does not own this state.
 
 ### Components

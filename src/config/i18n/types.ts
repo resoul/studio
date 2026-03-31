@@ -1,6 +1,7 @@
 export type Language = 'en' | 'ru' | 'uk' | 'it' | 'es' | 'fr';
 
 export interface TranslationDictionary {
+    'sidebar.my.account': string;
     'header.preview': string;
     'header.export': string;
     'header.desktopView': string;

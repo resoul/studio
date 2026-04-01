@@ -2,12 +2,95 @@ export type Language = 'en' | 'ru' | 'uk' | 'it' | 'es' | 'fr';
 
 export interface TranslationDictionary {
     'sidebar.my.account': string;
+    'layout.title': string;
+
     'header.preview': string;
     'header.export': string;
     'header.desktopView': string;
     'header.mobileView': string;
     'header.undo': string;
     'header.redo': string;
+
+    'layout.header.upgrade': string;
+    'layout.header.new': string;
+
+    'layout.apps.title': string;
+    'layout.apps.enabled': string;
+    'layout.apps.goToApps': string;
+    'layout.apps.description.projectManagement': string;
+    'layout.apps.description.healthcare': string;
+    'layout.apps.description.notesManagement': string;
+    'layout.apps.description.devops': string;
+    'layout.apps.description.webExperiences': string;
+
+    'layout.sidebar.profile': string;
+    'layout.sidebar.settings': string;
+    'layout.sidebar.language': string;
+    'layout.sidebar.upgrade': string;
+    'layout.sidebar.signOut': string;
+    'layout.sidebar.workspaces': string;
+    'layout.sidebar.newWorkspace': string;
+    'layout.sidebar.workspaceSettings': string;
+    'layout.sidebar.theme.light': string;
+    'layout.sidebar.theme.dark': string;
+    'layout.sidebar.mode': string;
+    'layout.sidebar.invite': string;
+    'layout.sidebar.help': string;
+    'layout.sidebar.inviteTooltip': string;
+    'layout.sidebar.helpTooltip': string;
+
+    'layout.nav.tasks': string;
+    'layout.nav.addTask': string;
+    'layout.nav.recent': string;
+    'layout.nav.recent1': string;
+    'layout.nav.recent2': string;
+    'layout.nav.unpinFromSidebar': string;
+
+    'layout.favorites.title': string;
+    'layout.favorites.favorite': string;
+    'layout.favorites.removeFavorite': string;
+    'layout.favorites.newTask': string;
+    'layout.favorites.newDeal': string;
+    'layout.favorites.recentNote': string;
+    'layout.favorites.leadAdded': string;
+
+    'layout.notifications.title': string;
+    'layout.notifications.tab.all': string;
+    'layout.notifications.tab.inbox': string;
+    'layout.notifications.tab.team': string;
+    'layout.notifications.tab.following': string;
+    'layout.notifications.inviteUsers': string;
+    'layout.notifications.teamSettings': string;
+    'layout.notifications.findMembers': string;
+    'layout.notifications.meetings': string;
+    'layout.notifications.groupSettings': string;
+    'layout.notifications.archiveAll': string;
+    'layout.notifications.markAllRead': string;
+    'layout.notifications.reply': string;
+    'layout.notifications.decline': string;
+    'layout.notifications.accept': string;
+    'layout.notifications.goToProfile': string;
+    'layout.notifications.accountVerified': string;
+    'layout.notifications.allowedView': string;
+    'layout.notifications.connected': string;
+    'layout.notifications.description.mentionedYouIn': string;
+    'layout.notifications.description.requestedAccessTo': string;
+    'layout.notifications.description.postedNewArticle': string;
+    'layout.notifications.description.requestedUpgradePlan': string;
+    'layout.notifications.description.commentedOn': string;
+    'layout.notifications.description.invitedYouToJoin': string;
+
+    'layout.chat.title': string;
+    'layout.chat.typing': string;
+    'layout.chat.joinRequest': string;
+    'layout.chat.joinMeta': string;
+    'layout.chat.placeholder': string;
+    'layout.chat.send': string;
+
+    'layout.secondaryHeader.workspace': string;
+    'layout.workspace.backToCrm': string;
+    'layout.workspace.logout': string;
+
     'canvas.emptyText': string;
     'welcome.title': string;
     'welcome.subtitle': string;

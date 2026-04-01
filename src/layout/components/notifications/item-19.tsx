@@ -8,8 +8,11 @@ import {
   AvatarStatus,
 } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Item19() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex grow gap-2.5 px-5">
       <Avatar>
@@ -41,7 +44,7 @@ export default function Item19() {
         <Card className="kt-card shadow-none flex items-center flex-row gap-1.5 px-2.5 py-1.5 rounded-lg bg-muted/70">
           <UserRoundCheck size={16} className="text-green-500 text-base" />
           <span className="font-medium text-green-500 text-sm">
-            You allowed Aaron to view
+            {t('layout.notifications.allowedView')}
           </span>
         </Card>
       </div>

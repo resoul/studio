@@ -21,6 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useLayout } from './layout-context';
 
 interface RecentItem {
@@ -33,6 +34,7 @@ const itemStyles =
   'group flex grow items-center justify-between gap-2.5 text-sm py-0 h-8 hover:bg-accent px-2 rounded-md';
 
 function DefaultContent({ items }: { items: RecentItem[] }) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = React.useState(true);
 
   return (
@@ -45,7 +47,9 @@ function DefaultContent({ items }: { items: RecentItem[] }) {
         <CollapsibleTrigger className="flex grow items-center justify-start h-8 px-0 gap-2.5 text-sm text-muted-foreground hover:text-foreground">
           <ChevronRight className="ms-0.25 size-3.5 in-data-[state=open]:rotate-90 in-data-[sidebar-collapsed]:hidden" />
           <Star className="size-4 text-muted-foreground hidden in-data-[sidebar-collapsed]:block" />
-          <span className="in-data-[sidebar-collapsed]:hidden">Favorites</span>
+          <span className="in-data-[sidebar-collapsed]:hidden">
+            {t('layout.favorites.title')}
+          </span>
         </CollapsibleTrigger>
         <Button
           variant="ghost"
@@ -87,7 +91,7 @@ function DefaultContent({ items }: { items: RecentItem[] }) {
                 sideOffset={15}
                 alignOffset={-2}
               >
-                Remove favorite
+                {t('layout.favorites.removeFavorite')}
               </TooltipContent>
             </Tooltip>
           </div>
@@ -98,6 +102,8 @@ function DefaultContent({ items }: { items: RecentItem[] }) {
 }
 
 function CollapsedContent({ items }: { items: RecentItem[] }) {
+  const { t } = useTranslation();
+
   return (
     <div className="px-(--sidebar-space-x)">
       <DropdownMenu>
@@ -109,7 +115,7 @@ function CollapsedContent({ items }: { items: RecentItem[] }) {
               </Button>
             </TooltipTrigger>
             <TooltipContent align="center" side="right" sideOffset={20}>
-              Favorite
+              {t('layout.favorites.favorite')}
             </TooltipContent>
           </Tooltip>
         </DropdownMenuTrigger>
@@ -123,7 +129,7 @@ function CollapsedContent({ items }: { items: RecentItem[] }) {
             <div className="group flex grow items-center justify-between h-8 px-2">
               <div className="flex grow items-center justify-start h-8 px-0 gap-2.5 text-sm text-muted-foreground">
                 <span className="in-data-[sidebar-collapsed]:hidden">
-                  Favorites
+                  {t('layout.favorites.title')}
                 </span>
               </div>
               <Button
@@ -165,7 +171,7 @@ function CollapsedContent({ items }: { items: RecentItem[] }) {
                     sideOffset={15}
                     alignOffset={-2}
                   >
-                    Remove favorite
+                    {t('layout.favorites.removeFavorite')}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -178,26 +184,27 @@ function CollapsedContent({ items }: { items: RecentItem[] }) {
 }
 
 export function SidebarDefaultFavorites() {
+  const { t } = useTranslation();
   const { sidebarCollapse } = useLayout();
   const items = [
     {
       id: 1,
-      name: 'New task',
+      name: t('layout.favorites.newTask'),
       company: 'Keenthemes',
     },
     {
       id: 2,
-      name: 'New deal',
+      name: t('layout.favorites.newDeal'),
       company: 'Google',
     },
     {
       id: 3,
-      name: 'Recent note',
+      name: t('layout.favorites.recentNote'),
       company: 'Apple',
     },
     {
       id: 4,
-      name: 'Lead added',
+      name: t('layout.favorites.leadAdded'),
       company: 'OpenAI',
     },
   ];

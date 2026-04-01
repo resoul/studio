@@ -8,8 +8,11 @@ import {
   AvatarStatus,
 } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Item20() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex grow gap-2.5 px-5">
       <Avatar>
@@ -40,10 +43,10 @@ export default function Item20() {
 
         <div className="flex flex-wrap gap-2.5">
           <Button size="sm" variant="outline">
-            <CircleCheck /> Connected
+            <CircleCheck /> {t('layout.notifications.connected')}
           </Button>
           <Button size="sm" variant="mono">
-            Go to profile
+            {t('layout.notifications.goToProfile')}
           </Button>
         </div>
       </div>

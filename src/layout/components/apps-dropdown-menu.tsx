@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface DropdownAppsItem {
   logo: string;
@@ -17,35 +18,37 @@ interface DropdownAppsItem {
 }
 
 export function AppsDropdownMenu({ trigger }: { trigger: ReactNode }) {
+  const { t } = useTranslation();
+
   const items: DropdownAppsItem[] = [
     {
       logo: 'jira.svg',
       title: 'Jira',
-      description: 'Project management',
+      description: t('layout.apps.description.projectManagement'),
       checkbox: false,
     },
     {
       logo: 'inferno.svg',
       title: 'Inferno',
-      description: 'Ensures healthcare app',
+      description: t('layout.apps.description.healthcare'),
       checkbox: true,
     },
     {
       logo: 'evernote.svg',
       title: 'Evernote',
-      description: 'Notes management app',
+      description: t('layout.apps.description.notesManagement'),
       checkbox: true,
     },
     {
       logo: 'gitlab.svg',
       title: 'Gitlab',
-      description: 'DevOps platform',
+      description: t('layout.apps.description.devops'),
       checkbox: false,
     },
     {
       logo: 'google-webdev.svg',
       title: 'Google webdev',
-      description: 'Building web experiences',
+      description: t('layout.apps.description.webExperiences'),
       checkbox: true,
     },
   ];
@@ -55,8 +58,8 @@ export function AppsDropdownMenu({ trigger }: { trigger: ReactNode }) {
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent className="w-[325px] p-0" side="bottom" align="end">
         <div className="flex items-center justify-between gap-2.5 text-xs text-secondary-foreground font-medium px-5 py-3 border-b border-b-border">
-          <span>Apps</span>
-          <span>Enabled</span>
+          <span>{t('layout.apps.title')}</span>
+          <span>{t('layout.apps.enabled')}</span>
         </div>
         <div className="flex flex-col scrollable-y-auto max-h-[400px] divide-y divide-border">
           {items.map((item, index) => (
@@ -91,7 +94,7 @@ export function AppsDropdownMenu({ trigger }: { trigger: ReactNode }) {
         </div>
         <div className="grid p-5 border-t border-t-border">
           <Button asChild variant="outline" size="sm">
-            <Link to="/account/api-keys">Go to Apps</Link>
+            <Link to="/account/api-keys">{t('layout.apps.goToApps')}</Link>
           </Button>
         </div>
       </DropdownMenuContent>

@@ -294,6 +294,9 @@ Each block type delegates its HTML rendering to its own `exportHtml.ts` inside
 - Import `useTranslation` from `@/hooks/useTranslation` (the `.ts` hook file).
 - Import `TranslationProvider` from `@/config/i18n/context` (the `.tsx` component file).
 - Language dictionaries belong in `src/config/i18n/`.
+- Any **new code** (new component, feature, refactor, or UI update) must be written with i18n support from the start:
+  add `t('...')` usage in the component and add keys to `TranslationDictionary` + all language files in the same task.
+- Do not postpone translations for later when adding new UI — translation updates are part of the definition of done.
 - If a new UI string is needed, add it to the `TranslationDictionary` type in `src/config/i18n/types.ts`
   and translate it in **all** language files (`en.ts`, `ru.ts`, `uk.ts`, `it.ts`, `es.ts`, `fr.ts`)
   before using it in the component.

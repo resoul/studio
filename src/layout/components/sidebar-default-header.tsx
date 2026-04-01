@@ -31,9 +31,9 @@ import {
     DropdownMenuRadioItem,
 } from '@/components/ui/dropdown-menu';
 import { useLayout } from './layout-context';
-import {useCallback} from "react";
-import {Language} from "@/config/i18n/types.ts";
-import {useTranslation} from "@/hooks/useTranslation.tsx";
+import { useCallback } from 'react';
+import { Language } from '@/config/i18n/types';
+import { useTranslation } from '@/hooks/useTranslation';
 import { toAbsoluteUrl } from '@/lib/helpers';
 import { Badge } from '@/components/ui/badge';
 
@@ -116,17 +116,17 @@ export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHead
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <User className="size-4" />
-                <span>Profile</span>
+                <span>{t('layout.sidebar.profile')}</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleSettings}>
                 <Settings className="size-4" />
-                <span>Settings</span>
+                <span>{t('layout.sidebar.settings')}</span>
               </DropdownMenuItem>
                 <DropdownMenuSub>
                     <DropdownMenuSubTrigger className="flex items-center gap-2 [&_[data-slot=dropdown-menu-sub-trigger-indicator]]:hidden hover:[&_[data-slot=badge]]:border-input data-[state=open]:[&_[data-slot=badge]]:border-input">
                         <Globe />
                         <span className="flex items-center justify-between gap-2 grow relative">
-                          Language
+                          {t('layout.sidebar.language')}
                           <Badge
                               variant="outline"
                               className="absolute end-0 top-1/2 -translate-y-1/2"
@@ -169,17 +169,17 @@ export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHead
                 </DropdownMenuSub>
               <DropdownMenuItem>
                 <Crown className="size-4" />
-                <span>Upgrade</span>
+                <span>{t('layout.sidebar.upgrade')}</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <LogOut className="size-4" />
-                <span>Sign Out</span>
+                <span>{t('layout.sidebar.signOut')}</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
 
             {/* Workspaces Section */}
             <DropdownMenuSeparator />
-            <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+            <DropdownMenuLabel>{t('layout.sidebar.workspaces')}</DropdownMenuLabel>
             <DropdownMenuGroup>
               {mockWorkspaces.map((workspace) => (
                 <DropdownMenuItem
@@ -207,12 +207,12 @@ export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHead
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <Plus className="size-4" />
-                <span>New Workspace</span>
+                <span>{t('layout.sidebar.newWorkspace')}</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuItem onClick={onSwitchToWorkspace}>
               <Building2 className="size-4" />
-              <span>Workspace Settings</span>
+              <span>{t('layout.sidebar.workspaceSettings')}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -223,7 +223,12 @@ export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHead
               ) : (
                 <Moon className="size-4" />
               )}
-              <span>{theme === 'dark' ? 'Light' : 'Dark'} Mode</span>
+              <span>
+                {theme === 'dark'
+                  ? t('layout.sidebar.theme.light')
+                  : t('layout.sidebar.theme.dark')}{' '}
+                {t('layout.sidebar.mode')}
+              </span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

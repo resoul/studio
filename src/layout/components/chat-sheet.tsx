@@ -39,6 +39,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { useTranslation } from '@/hooks/useTranslation';
 import { AvatarGroup } from './avatar-group';
 
 interface Message {
@@ -52,6 +53,7 @@ interface Message {
 
 export function ChatSheet({ trigger }: { trigger: ReactNode }) {
   const [emailInput, setEmailInput] = useState('');
+  const { t } = useTranslation();
 
   const messages: Message[] = [
     {
@@ -107,7 +109,7 @@ export function ChatSheet({ trigger }: { trigger: ReactNode }) {
       <SheetContent className="p-0 gap-0 sm:w-[450px] sm:max-w-none inset-5 start-auto h-auto rounded-lg [&_[data-slot=sheet-close]]:top-4.5 [&_[data-slot=sheet-close]]:end-5">
         <SheetHeader>
           <div className="flex items-center justify-between p-3 border-b border-border">
-            <SheetTitle>Chat</SheetTitle>
+            <SheetTitle>{t('layout.chat.title')}</SheetTitle>
           </div>
           <div className="border-b border-border p-3 shadow-xs">
             <div className="flex items-center justify-between gap-2">
@@ -127,7 +129,7 @@ export function ChatSheet({ trigger }: { trigger: ReactNode }) {
                     HR Team
                   </Link>
                   <span className="text-xs italic text-muted-foreground block">
-                    Jessy is typing...
+                    {t('layout.chat.typing')}
                   </span>
                 </div>
               </div>
@@ -157,30 +159,30 @@ export function ChatSheet({ trigger }: { trigger: ReactNode }) {
                   >
                     <DropdownMenuItem asChild>
                       <Link to="/account/members/teams">
-                        <Users /> Invite Users
+                        <Users /> {t('layout.notifications.inviteUsers')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSub>
                       <DropdownMenuSubTrigger>
                         <Settings2 />
-                        <span>Team Settings</span>
+                        <span>{t('layout.notifications.teamSettings')}</span>
                       </DropdownMenuSubTrigger>
                       <DropdownMenuPortal>
                         <DropdownMenuSubContent className="w-44">
                           <DropdownMenuItem asChild>
                             <Link to="/account/members/import-members">
                               <Shield />
-                              Find Members
+                              {t('layout.notifications.findMembers')}
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
                             <Link to="/account/members/import-members">
-                              <Calendar /> Meetings
+                              <Calendar /> {t('layout.notifications.meetings')}
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
                             <Link to="/account/members/import-members">
-                              <Shield /> Group Settings
+                              <Shield /> {t('layout.notifications.groupSettings')}
                             </Link>
                           </DropdownMenuItem>
                         </DropdownMenuSubContent>
@@ -188,7 +190,7 @@ export function ChatSheet({ trigger }: { trigger: ReactNode }) {
                     </DropdownMenuSub>
                     <DropdownMenuItem asChild>
                       <Link to="/account/security/privacy-settings">
-                        <Shield /> Group Settings
+                        <Shield /> {t('layout.notifications.groupSettings')}
                       </Link>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -277,19 +279,19 @@ export function ChatSheet({ trigger }: { trigger: ReactNode }) {
                     Jane Perez
                   </Link>
                   <span className="text-muted-foreground">
-                    wants to join chat
+                    {t('layout.chat.joinRequest')}
                   </span>
                 </div>
                 <span className="text-xs text-muted-foreground">
-                  1 day ago • Design Team
+                  {t('layout.chat.joinMeta')}
                 </span>
               </div>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline">
-                  Decline
+                  {t('layout.notifications.decline')}
                 </Button>
                 <Button size="sm" variant="mono">
-                  Accept
+                  {t('layout.notifications.accept')}
                 </Button>
               </div>
             </div>
@@ -304,7 +306,7 @@ export function ChatSheet({ trigger }: { trigger: ReactNode }) {
               type="text"
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
-              placeholder="Write a message..."
+              placeholder={t('layout.chat.placeholder')}
               className="w-full ps-12 pe-24 py-4 h-auto"
             />
             <div className="absolute end-7 top-1/2 -translate-y-1/2 flex gap-2">
@@ -312,7 +314,7 @@ export function ChatSheet({ trigger }: { trigger: ReactNode }) {
                 <Upload className="size-4!" />
               </Button>
               <Button size="sm" variant="mono">
-                Send
+                {t('layout.chat.send')}
               </Button>
             </div>
           </div>

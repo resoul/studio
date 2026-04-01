@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTranslation } from '@/hooks/useTranslation';
 import { SidebarDefault } from './sidebar-default';
 import { SidebarWorkspace } from './sidebar-workspace';
 import {
@@ -25,6 +26,7 @@ export function Header() {
     const isMobile = useIsMobile();
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const { headerSlot } = useHeaderSlot();
+    const { t } = useTranslation();
     const [isWorkspaceMode, setIsWorkspaceMode] = useState(false);
 
     useEffect(() => {
@@ -75,7 +77,7 @@ export function Header() {
                             className="bg-gradient-to-r from-blue-800 to-blue-600 text-white hover:from-blue-600 hover:text-white"
                         >
                             <Award className="size-4 text-white" />
-                            Upgrade
+                            {t('layout.header.upgrade')}
                         </Button>
                         <Button
                             variant="ghost"
@@ -83,7 +85,7 @@ export function Header() {
                             className="text-white hover:text-white hover:bg-zinc-800 hover:border-zinc-800"
                         >
                             <CirclePlus className="size-4 text-white" />
-                            New
+                            {t('layout.header.new')}
                         </Button>
                         <Separator orientation="vertical" className="bg-zinc-600 h-4 mx-1" />
                         <Button

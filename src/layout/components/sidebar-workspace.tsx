@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface Workspace {
   id: string;
@@ -124,6 +125,7 @@ interface SidebarWorkspaceProps {
 
 export function SidebarWorkspace({ onSwitchToDefault }: SidebarWorkspaceProps) {
   const location = useLocation();
+  const { t } = useTranslation();
 
   const getPlanBadgeVariant = (plan: string) => {
     switch (plan) {
@@ -160,7 +162,7 @@ export function SidebarWorkspace({ onSwitchToDefault }: SidebarWorkspaceProps) {
           >
             <ChevronLeft className="size-4" />
             <span className="in-data-[sidebar-collapsed]:hidden">
-              Back to CRM
+              {t('layout.workspace.backToCrm')}
             </span>
           </Button>
         </div>
@@ -244,7 +246,7 @@ export function SidebarWorkspace({ onSwitchToDefault }: SidebarWorkspaceProps) {
         </div>
         <Button variant="ghost" size="sm">
           <LogOut className="size-3 mr-2" />
-          Logs Out
+          {t('layout.workspace.logout')}
         </Button>
       </div>
     </>

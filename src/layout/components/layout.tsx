@@ -7,11 +7,13 @@ import { Sidebar } from './sidebar';
 import { Helmet } from '@packages/react-helmet-async';
 import { SecondarySidebar } from './secondary-sidebar';
 import { useSecondarySidebarSlot } from './secondary-sidebar-slot-context';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export function Layout() {
     const { sidebarCollapse } = useLayout();
     const { isVisible: hasSecondarySidebar } = useSecondarySidebarSlot();
     const isMobile = useIsMobile();
+    const { t } = useTranslation();
 
     const rootProps = {
         className: cn(
@@ -30,7 +32,7 @@ export function Layout() {
     return (
         <>
             <Helmet>
-                <title>Studio - 22</title>
+                <title>{t('layout.title')}</title>
             </Helmet>
             <div {...rootProps}>
                 <Header />

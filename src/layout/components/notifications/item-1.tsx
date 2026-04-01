@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface ItemProps {
   userName: string;
@@ -33,6 +34,7 @@ export default function Item1({
   text,
 }: ItemProps) {
   const [emailInput, setEmailInput] = useState('');
+  const { t } = useTranslation();
   return (
     <div className="flex grow gap-2.5 px-5">
       <Avatar>
@@ -77,7 +79,7 @@ export default function Item1({
             <ImageIcon className="absolute end-3 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
             <Input
               type="text"
-              placeholder="Reply"
+              placeholder={t('layout.notifications.reply')}
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
               className="w-full"

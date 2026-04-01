@@ -8,8 +8,11 @@ import {
   AvatarStatus,
 } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Item17() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex grow gap-2.5 px-5">
       <Avatar>
@@ -60,10 +63,10 @@ export default function Item17() {
 
         <div className="flex flex-wrap gap-2.5">
           <Button size="sm" variant="outline">
-            Decline
+            {t('layout.notifications.decline')}
           </Button>
           <Button size="sm" variant="mono">
-            Accept
+            {t('layout.notifications.accept')}
           </Button>
         </div>
       </div>

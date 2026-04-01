@@ -24,9 +24,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useLayout } from './layout-context';
 
 function TasksDropdownMenu({ trigger }: { trigger: React.ReactNode }) {
+  const { t } = useTranslation();
   const { pinSidebarNavItem, sidebarCollapse } = useLayout();
 
   return (
@@ -39,7 +41,7 @@ function TasksDropdownMenu({ trigger }: { trigger: React.ReactNode }) {
                 <span>{trigger}</span>
               </TooltipTrigger>
               <TooltipContent align="center" side="right" sideOffset={28}>
-                Tasks
+                {t('layout.nav.tasks')}
               </TooltipContent>
             </Tooltip>
           ) : (
@@ -57,31 +59,32 @@ function TasksDropdownMenu({ trigger }: { trigger: React.ReactNode }) {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <Plus />
-            <span>Add Task</span>
+            <span>{t('layout.nav.addTask')}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Recent</DropdownMenuLabel>
+          <DropdownMenuLabel>{t('layout.nav.recent')}</DropdownMenuLabel>
           <DropdownMenuItem>
             <StickyNote />
-            <span>Recent 1</span>
+            <span>{t('layout.nav.recent1')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <StickyNote />
-            <span>Recent 2</span>
+            <span>{t('layout.nav.recent2')}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => pinSidebarNavItem('tasks')}>
           <PinOff />
-          <span>Unpin from sidebar</span>
+          <span>{t('layout.nav.unpinFromSidebar')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 function StoreDropdownMenu({ trigger }: { trigger: React.ReactNode }) {
+  const { t } = useTranslation();
   const { pinSidebarNavItem, sidebarCollapse } = useLayout();
     const navigate = useNavigate();
     const handleCustomerListDetails   = useCallback(() => navigate('/store/customer-list-details'), [navigate]);
@@ -96,7 +99,7 @@ function StoreDropdownMenu({ trigger }: { trigger: React.ReactNode }) {
                 <span>{trigger}</span>
               </TooltipTrigger>
               <TooltipContent align="center" side="right" sideOffset={28}>
-                Tasks
+                {t('layout.nav.tasks')}
               </TooltipContent>
             </Tooltip>
           ) : (
@@ -114,25 +117,25 @@ function StoreDropdownMenu({ trigger }: { trigger: React.ReactNode }) {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <Plus />
-            <span>Add Task</span>
+            <span>{t('layout.nav.addTask')}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Recent</DropdownMenuLabel>
+          <DropdownMenuLabel>{t('layout.nav.recent')}</DropdownMenuLabel>
           <DropdownMenuItem onClick={handleCustomerListDetails}>
             <StickyNote />
-            <span>Recent 1</span>
+            <span>{t('layout.nav.recent1')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <StickyNote />
-            <span>Recent 2</span>
+            <span>{t('layout.nav.recent2')}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => pinSidebarNavItem('store')}>
           <PinOff />
-          <span>Unpin from sidebar</span>
+          <span>{t('layout.nav.unpinFromSidebar')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

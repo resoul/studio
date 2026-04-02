@@ -20,15 +20,14 @@ import { PreviewModal } from '@/modules/campaigns/components/email-builder/Previ
 import { ExportModal } from '@/modules/campaigns/components/email-builder/ExportModal.tsx';
 import { PreviewExportSheet } from '@/modules/campaigns/components/email-builder/PreviewExportSheet.tsx';
 import { EmailBuilderSheet } from '@/modules/campaigns/components/email-builder/EmailBuilderSheet.tsx';
-import { WelcomeScreen } from '@/modules/campaigns/components/email-builder/WelcomeScreen.tsx';
 import { UploadHtmlModal } from '@/modules/campaigns/components/email-builder/UploadHtmlModal.tsx';
 import { AIGenerateModal } from '@/modules/campaigns/components/email-builder/AIGenerateModal.tsx';
-import { TemplatePickerModal } from '@/modules/campaigns/components/email-builder/TemplatePickerModal.tsx';
 import { BlockRenderer } from '@/modules/campaigns/components/email-builder/BlockRenderer.tsx';
 import { ImageEditorModal } from '@/modules/campaigns/components/email-builder/ImageEditorModal.tsx';
 import { LeftSidebar } from '@/modules/campaigns/components/email-builder/index-page/LeftSidebar.tsx';
 import { PaletteDragPreview } from '@/modules/campaigns/components/email-builder/index-page/PaletteDragPreview.tsx';
 import { BlockType, EmailBlock, EmailTemplate } from '@/types/email-builder.ts';
+import { getStarterTemplateById } from '@/data/email-templates';
 import { useIsMobile } from '@/hooks/use-mobile.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import {
@@ -57,13 +56,16 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
 export default function CampaignBuilderPage() {
-    const { campaignId } = useParams<{ campaignId: string }>();
+    const { campaignId, templateId } = useParams<{ campaignId?: string; templateId?: string }>();
     const navigate = useNavigate();
     const { toast } = useToast();
+    const { t, language } = useTranslation();
     const [isSaving, setIsSaving] = useState(false);
 
     const returnPath =
-        campaignId === 'new'
+        templateId
+            ? '/campaigns/templates'
+            : campaignId === 'new'
             ? '/campaigns/create'
             : `/campaigns/${campaignId}/edit`;
 
@@ -173,7 +175,6 @@ export default function CampaignBuilderPage() {
     const [exportFileName, setExportFileName] = useState('email-template.html');
     const [showUpload, setShowUpload] = useState(false);
     const [showAIGenerate, setShowAIGenerate] = useState(false);
-    const [showTemplates, setShowTemplates] = useState(false);
     const [dragOverlay, setDragOverlay] = useState<EmailBlock | null>(null);
     const [dragSource, setDragSource] = useState<'palette' | 'canvas' | null>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -185,6 +186,21 @@ export default function CampaignBuilderPage() {
 
     const isEmpty = template.rows.length === 0;
     const selectedBlock = getSelectedBlock();
+
+    useEffect(() => {
+        if (!templateId) return;
+
+        const selectedTemplate = getStarterTemplateById(language, templateId);
+        if (!selectedTemplate) {
+            toast({ description: t('campaigns.templates.notFound'), variant: 'destructive' });
+            navigate('/campaigns/templates', { replace: true });
+            return;
+        }
+
+        setTemplate(selectedTemplate.build());
+        setSelectedBlockId(null);
+        setSelectedRowId(null);
+    }, [language, navigate, setSelectedBlockId, setSelectedRowId, setTemplate, t, templateId, toast]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -317,11 +333,9 @@ export default function CampaignBuilderPage() {
     const openPreviewExportSettings = useCallback(() => setShowPreviewExportSheet(true), []);
     const openUpload = useCallback(() => setShowUpload(true), []);
     const openAIGenerate = useCallback(() => setShowAIGenerate(true), []);
-    const openTemplates = useCallback(() => setShowTemplates(true), []);
+    const openTemplatesPage = useCallback(() => navigate('/campaigns/templates'), [navigate]);
 
     const allBlockIds = template.rows.flatMap((r) => r.blocks.flatMap((col) => col.map((b) => b.id)));
-
-    const { t } = useTranslation();
 
     const handleDesktopView = useCallback(() => setViewMode('desktop'), [setViewMode]);
     const handleMobileView = useCallback(() => setViewMode('mobile'), [setViewMode]);
@@ -406,7 +420,7 @@ export default function CampaignBuilderPage() {
                                 Generate with AI
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={openTemplates}>
+                            <DropdownMenuItem onClick={openTemplatesPage}>
                                 <LayoutTemplate className="h-4 w-4 mr-2" />
                                 Templates
                             </DropdownMenuItem>
@@ -439,53 +453,44 @@ export default function CampaignBuilderPage() {
                             onDragCancel={resetDragState}
                         >
                             <div className="flex flex-1 overflow-hidden">
-                                {isEmpty ? (
-                                    <WelcomeScreen
-                                        onStartScratch={handleStartScratch}
-                                        onUploadHtml={openUpload}
-                                        onGenerateAI={openAIGenerate}
-                                        onSelectTemplate={handleImportTemplate}
+                                <>
+                                    <LeftSidebar
+                                        leftPanelTab={leftPanelTab}
+                                        onLeftPanelTabChange={setLeftPanelTab}
+                                        onAddRow={addRow}
+                                        onAddBlockToCanvas={addBlockToCanvas}
                                     />
-                                ) : (
-                                    <>
-                                        <LeftSidebar
-                                            leftPanelTab={leftPanelTab}
-                                            onLeftPanelTabChange={setLeftPanelTab}
-                                            onAddRow={addRow}
-                                            onAddBlockToCanvas={addBlockToCanvas}
+                                    <SortableContext items={allBlockIds} strategy={verticalListSortingStrategy}>
+                                        <Canvas
+                                            template={template}
+                                            selectedBlockId={selectedBlockId}
+                                            selectedRowId={selectedRowId}
+                                            viewMode={viewMode}
+                                            isDragging={isDragging}
+                                            activeDropId={activeDropId}
+                                            onSelectBlock={handleSelectBlock}
+                                            onDeselectAll={handleDeselectAll}
+                                            onMoveRow={moveRow}
+                                            onMoveBlock={moveBlock}
+                                            onDeleteBlock={deleteBlock}
+                                            onDeleteRow={deleteRow}
+                                            onChangeRowColumns={changeRowColumns}
+                                            onAddBlockToRow={addBlockToRow}
+                                            onUpdateBlock={updateBlock}
+                                            onDoubleClickBlock={handleDoubleClickBlock}
                                         />
-                                        <SortableContext items={allBlockIds} strategy={verticalListSortingStrategy}>
-                                            <Canvas
+                                    </SortableContext>
+                                    {!isMobile && (
+                                        <div className="w-72 shrink-0 overflow-y-auto border-l border-border bg-card">
+                                            <PropertiesPanel
+                                                block={selectedBlock}
+                                                onUpdate={updateBlock}
                                                 template={template}
-                                                selectedBlockId={selectedBlockId}
-                                                selectedRowId={selectedRowId}
-                                                viewMode={viewMode}
-                                                isDragging={isDragging}
-                                                activeDropId={activeDropId}
-                                                onSelectBlock={handleSelectBlock}
-                                                onDeselectAll={handleDeselectAll}
-                                                onMoveRow={moveRow}
-                                                onMoveBlock={moveBlock}
-                                                onDeleteBlock={deleteBlock}
-                                                onDeleteRow={deleteRow}
-                                                onChangeRowColumns={changeRowColumns}
-                                                onAddBlockToRow={addBlockToRow}
-                                                onUpdateBlock={updateBlock}
-                                                onDoubleClickBlock={handleDoubleClickBlock}
+                                                onUpdateTemplate={handleUpdateTemplate}
                                             />
-                                        </SortableContext>
-                                        {!isMobile && (
-                                            <div className="w-72 shrink-0 overflow-y-auto border-l border-border bg-card">
-                                                <PropertiesPanel
-                                                    block={selectedBlock}
-                                                    onUpdate={updateBlock}
-                                                    template={template}
-                                                    onUpdateTemplate={handleUpdateTemplate}
-                                                />
-                                            </div>
-                                        )}
-                                    </>
-                                )}
+                                        </div>
+                                    )}
+                                </>
                             </div>
 
                             <DragOverlay>
@@ -554,7 +559,6 @@ export default function CampaignBuilderPage() {
                         />
                         <UploadHtmlModal open={showUpload} onOpenChange={setShowUpload} onImport={handleImportTemplate} />
                         <AIGenerateModal open={showAIGenerate} onOpenChange={setShowAIGenerate} onGenerate={handleImportTemplate} />
-                        <TemplatePickerModal open={showTemplates} onOpenChange={setShowTemplates} onSelectTemplate={handleImportTemplate} />
 
                         {editingImageBlockId && (() => {
                             const editingImageBlock = template.rows.flatMap((r) => r.blocks.flatMap((col) => col)).find((b) => b.id === editingImageBlockId);

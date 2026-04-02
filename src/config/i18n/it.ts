@@ -101,4 +101,12 @@ export const it: TranslationDictionary = {
     'welcome.ai.title': 'Genera con AI',
     'welcome.ai.desc': 'Descrivi la tua email e lascia che l\'AI la crei',
     'welcome.templates.title': 'Oppure scegli un template iniziale',
+
+    'campaigns.templates.title': 'Template',
+    'campaigns.templates.subtitle': 'Scegli un template e aprilo nell\'editor.',
+    'campaigns.templates.startScratch': 'Inizia da zero',
+    'campaigns.templates.listTitle': 'Template iniziali',
+    'campaigns.templates.listDescription': 'Seleziona uno dei layout pronti per avviare rapidamente il contenuto della campagna.',
+    'campaigns.templates.useTemplate': 'Usa template',
+    'campaigns.templates.notFound': 'Template non trovato. Scegline un altro dalla lista.',
 };

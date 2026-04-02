@@ -101,4 +101,12 @@ export const es: TranslationDictionary = {
     'welcome.ai.title': 'Generar con IA',
     'welcome.ai.desc': 'Describe tu email y deja que la IA lo construya',
     'welcome.templates.title': 'O elige una plantilla inicial',
+
+    'campaigns.templates.title': 'Plantillas',
+    'campaigns.templates.subtitle': 'Elige una plantilla y ábrela en el editor.',
+    'campaigns.templates.startScratch': 'Empezar desde cero',
+    'campaigns.templates.listTitle': 'Plantillas iniciales',
+    'campaigns.templates.listDescription': 'Selecciona uno de los diseños predefinidos para empezar rápido con el contenido de tu campaña.',
+    'campaigns.templates.useTemplate': 'Usar plantilla',
+    'campaigns.templates.notFound': 'No se encontró la plantilla. Elige otra de la lista.',
 };

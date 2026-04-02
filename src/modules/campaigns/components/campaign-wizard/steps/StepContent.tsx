@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CampaignFormData, StepErrors } from '@/types/campaign';
-import { LayoutTemplate, CheckCircle, ExternalLink } from 'lucide-react';
+import { LayoutTemplate, CheckCircle, ExternalLink, Rss, FlaskConical } from 'lucide-react';
 
 const SUBJECT_MAX = 60;
 
@@ -14,7 +14,7 @@ interface StepContentProps {
     onOpenBuilder?: (data: CampaignFormData) => void;
 }
 
-export function StepContent({ data, errors, onChange, onOpenBuilder }: StepContentProps) {
+export function StepContent({ data, errors, onChange }: StepContentProps) {
     const navigate = useNavigate();
     const { campaignId } = useParams<{ campaignId?: string }>();
 
@@ -23,18 +23,31 @@ export function StepContent({ data, errors, onChange, onOpenBuilder }: StepConte
         [onChange],
     );
 
+    const handleSubjectBChange = useCallback(
+        (e: ChangeEvent<HTMLInputElement>) => onChange({ subjectB: e.target.value }),
+        [onChange],
+    );
+
     const handlePreheaderChange = useCallback(
         (e: ChangeEvent<HTMLInputElement>) => onChange({ preheader: e.target.value }),
+        [onChange],
+    );
+
+    const handleRssFeedUrlChange = useCallback(
+        (e: ChangeEvent<HTMLInputElement>) => onChange({ rssFeedUrl: e.target.value }),
         [onChange],
     );
 
     const handleOpenBuilder = useCallback(() => {
         const id = campaignId ?? 'new';
         navigate(`/campaigns/${id}/content`);
-    }, [onOpenBuilder, data, navigate, campaignId]);
+    }, [navigate, campaignId]);
 
     const subjectLen = data.subject.length;
     const subjectOverLimit = subjectLen > SUBJECT_MAX;
+
+    const isRss = data.type === 'rss';
+    const isAb  = data.type === 'ab';
 
     return (
         <div className="space-y-6">
@@ -45,10 +58,44 @@ export function StepContent({ data, errors, onChange, onOpenBuilder }: StepConte
                 </p>
             </div>
 
+            {/* RSS feed URL — only for rss type */}
+            {isRss && (
+                <div className="space-y-1.5">
+                    <Label htmlFor="rss-feed-url">
+                        <span className="inline-flex items-center gap-1.5">
+                            <Rss className="h-3.5 w-3.5 text-orange-500" />
+                            RSS feed URL <span className="text-destructive">*</span>
+                        </span>
+                    </Label>
+                    <Input
+                        id="rss-feed-url"
+                        type="url"
+                        value={data.rssFeedUrl}
+                        onChange={handleRssFeedUrlChange}
+                        placeholder="https://yourblog.com/feed.xml"
+                        className={errors.rssFeedUrl ? 'border-destructive' : ''}
+                    />
+                    {errors.rssFeedUrl && (
+                        <p className="text-xs text-destructive">{errors.rssFeedUrl}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                        Campaigns will be sent automatically when new items appear in the feed.
+                    </p>
+                </div>
+            )}
+
+            {/* Subject line */}
             <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                     <Label htmlFor="subject">
-                        Subject line <span className="text-destructive">*</span>
+                        {isAb ? (
+                            <span className="inline-flex items-center gap-1.5">
+                                <FlaskConical className="h-3.5 w-3.5 text-violet-500" />
+                                Subject line — Variant A <span className="text-destructive">*</span>
+                            </span>
+                        ) : (
+                            <>Subject line <span className="text-destructive">*</span></>
+                        )}
                     </Label>
                     <span
                         className={[
@@ -63,7 +110,7 @@ export function StepContent({ data, errors, onChange, onOpenBuilder }: StepConte
                     id="subject"
                     value={data.subject}
                     onChange={handleSubjectChange}
-                    placeholder="Your email subject…"
+                    placeholder={isAb ? 'Variant A subject…' : 'Your email subject…'}
                     className={errors.subject || subjectOverLimit ? 'border-destructive' : ''}
                 />
                 {errors.subject && (
@@ -76,6 +123,37 @@ export function StepContent({ data, errors, onChange, onOpenBuilder }: StepConte
                 )}
             </div>
 
+            {/* Subject B — only for A/B type */}
+            {isAb && (
+                <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                        <Label htmlFor="subject-b">
+                            <span className="inline-flex items-center gap-1.5">
+                                <FlaskConical className="h-3.5 w-3.5 text-violet-500" />
+                                Subject line — Variant B <span className="text-destructive">*</span>
+                            </span>
+                        </Label>
+                        <span className="text-xs tabular-nums text-muted-foreground">
+                            {data.subjectB.length}/{SUBJECT_MAX}
+                        </span>
+                    </div>
+                    <Input
+                        id="subject-b"
+                        value={data.subjectB}
+                        onChange={handleSubjectBChange}
+                        placeholder="Variant B subject…"
+                        className={errors.subjectB ? 'border-destructive' : ''}
+                    />
+                    {errors.subjectB && (
+                        <p className="text-xs text-destructive">{errors.subjectB}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground">
+                        Each variant is sent to 50% of the audience. The winner is determined by open rate.
+                    </p>
+                </div>
+            )}
+
+            {/* Preheader */}
             <div className="space-y-1.5">
                 <Label htmlFor="preheader">
                     Preheader{' '}
@@ -92,6 +170,7 @@ export function StepContent({ data, errors, onChange, onOpenBuilder }: StepConte
                 </p>
             </div>
 
+            {/* Email builder */}
             <div className="space-y-1.5">
                 <Label>Email template</Label>
                 <button

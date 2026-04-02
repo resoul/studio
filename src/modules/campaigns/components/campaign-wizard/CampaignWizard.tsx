@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import {
     CampaignFormData,
+    CampaignType,
     CAMPAIGN_FORM_DEFAULTS,
     WizardStep,
     WIZARD_STEPS,
@@ -42,6 +43,10 @@ function validateStep(step: WizardStep, data: CampaignFormData): ValidationResul
 
         case 'content':
             if (!data.subject.trim()) errors.subject = 'Subject line is required.';
+            if (data.type === 'ab' && !data.subjectB.trim())
+                errors.subjectB = 'Variant B subject line is required.';
+            if (data.type === 'rss' && !data.rssFeedUrl.trim())
+                errors.rssFeedUrl = 'RSS feed URL is required.';
             break;
 
         case 'schedule':
@@ -63,6 +68,7 @@ interface CampaignWizardProps {
     onSend?: (data: CampaignFormData) => void;
     onOpenBuilder?: (data: CampaignFormData) => void;
     onSendTest?: (data: CampaignFormData) => void;
+    prefillType?: CampaignType;
     initialData?: Partial<CampaignFormData>;
     className?: string;
 }
@@ -72,6 +78,7 @@ export function CampaignWizard({
                                    onSend,
                                    onOpenBuilder,
                                    onSendTest,
+                                   prefillType,
                                    initialData,
                                    className = '',
                                }: CampaignWizardProps) {
@@ -79,6 +86,8 @@ export function CampaignWizard({
 
     const [data, setData] = useState<CampaignFormData>({
         ...CAMPAIGN_FORM_DEFAULTS,
+        // prefillType takes priority over initialData.type, which takes priority over default
+        ...(prefillType ? { type: prefillType } : {}),
         ...initialData,
     });
     const [currentStep, setCurrentStep] = useState<WizardStep>('metadata');
@@ -126,6 +135,17 @@ export function CampaignWizard({
         setCurrentStep(prevStep);
     }, [currentIndex]);
 
+    const handleSend = useCallback(async () => {
+        setIsSending(true);
+        try {
+            await onSend?.(data);
+        } catch {
+            toast({ description: 'Failed to send campaign.', variant: 'destructive' });
+        } finally {
+            setIsSending(false);
+        }
+    }, [data, onSend, toast]);
+
     const handleContinue = useCallback(() => {
         if (isLastStep) {
             handleSend();
@@ -142,7 +162,7 @@ export function CampaignWizard({
         const nextStep = WIZARD_STEPS[currentIndex + 1];
         setCurrentStep(nextStep);
         setVisitedSteps((prev) => new Set([...prev, nextStep]));
-    }, [isLastStep, currentStep, data, currentIndex]);
+    }, [isLastStep, currentStep, data, currentIndex, handleSend]);
 
     const handleSaveDraft = useCallback(async () => {
         setIsSaving(true);
@@ -156,17 +176,6 @@ export function CampaignWizard({
         }
     }, [data, onSave, toast]);
 
-    const handleSend = useCallback(async () => {
-        setIsSending(true);
-        try {
-            await onSend?.(data);
-        } catch {
-            toast({ description: 'Failed to send campaign.', variant: 'destructive' });
-        } finally {
-            setIsSending(false);
-        }
-    }, [data, onSend, toast]);
-
     const handleOpenBuilder = useCallback(() => {
         onOpenBuilder?.(data);
     }, [data, onOpenBuilder]);
@@ -178,17 +187,11 @@ export function CampaignWizard({
     function renderStep() {
         switch (currentStep) {
             case 'metadata':
-                return (
-                    <StepMetadata data={data} errors={errors} onChange={handleChange} />
-                );
+                return <StepMetadata data={data} errors={errors} onChange={handleChange} />;
             case 'sender':
-                return (
-                    <StepSender data={data} errors={errors} onChange={handleChange} />
-                );
+                return <StepSender data={data} errors={errors} onChange={handleChange} />;
             case 'audience':
-                return (
-                    <StepAudience data={data} errors={errors} onChange={handleChange} />
-                );
+                return <StepAudience data={data} errors={errors} onChange={handleChange} />;
             case 'content':
                 return (
                     <StepContent
@@ -199,9 +202,7 @@ export function CampaignWizard({
                     />
                 );
             case 'schedule':
-                return (
-                    <StepSchedule data={data} errors={errors} onChange={handleChange} />
-                );
+                return <StepSchedule data={data} errors={errors} onChange={handleChange} />;
             case 'review':
                 return (
                     <StepReview

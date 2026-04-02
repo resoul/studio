@@ -35,6 +35,13 @@ interface StepReviewProps {
     onSendTest: () => void;
 }
 
+const TYPE_LABELS: Record<string, string> = {
+    regular:   'Regular',
+    ab:        'A/B test',
+    automated: 'Automated',
+    rss:       'RSS',
+};
+
 export function StepReview({ data, onGoToStep, onSendTest }: StepReviewProps) {
     const total = estimatedTotal(data.listIds);
     const listNames = data.listIds.map(
@@ -45,12 +52,6 @@ export function StepReview({ data, onGoToStep, onSendTest }: StepReviewProps) {
         data.scheduleType === 'now'
             ? 'Send immediately'
             : `${data.sendDate} at ${data.sendTime} (${data.timezone})`;
-
-    const typeLabels: Record<string, string> = {
-        regular: 'Regular',
-        ab: 'A/B test',
-        automated: 'Automated',
-    };
 
     return (
         <div className="space-y-6">
@@ -67,7 +68,7 @@ export function StepReview({ data, onGoToStep, onSendTest }: StepReviewProps) {
                 </ReviewRow>
 
                 <ReviewRow label="Type" step="metadata" onEdit={onGoToStep}>
-                    {typeLabels[data.type]}
+                    {TYPE_LABELS[data.type] ?? data.type}
                 </ReviewRow>
 
                 <ReviewRow label="From" step="sender" onEdit={onGoToStep}>
@@ -103,12 +104,26 @@ export function StepReview({ data, onGoToStep, onSendTest }: StepReviewProps) {
                     )}
                 </ReviewRow>
 
-                <ReviewRow label="Subject" step="content" onEdit={onGoToStep}>
+                {/* RSS feed URL */}
+                {data.type === 'rss' && (
+                    <ReviewRow label="RSS feed" step="content" onEdit={onGoToStep}>
+                        {data.rssFeedUrl || <span className="text-muted-foreground">—</span>}
+                    </ReviewRow>
+                )}
+
+                <ReviewRow label={data.type === 'ab' ? 'Subject A' : 'Subject'} step="content" onEdit={onGoToStep}>
                     {data.subject || <span className="text-muted-foreground">—</span>}
                     {data.preheader && (
                         <p className="mt-0.5 text-xs text-muted-foreground">{data.preheader}</p>
                     )}
                 </ReviewRow>
+
+                {/* A/B variant B */}
+                {data.type === 'ab' && (
+                    <ReviewRow label="Subject B" step="content" onEdit={onGoToStep}>
+                        {data.subjectB || <span className="text-muted-foreground">—</span>}
+                    </ReviewRow>
+                )}
 
                 <ReviewRow label="Template" step="content" onEdit={onGoToStep}>
                     {data.templateId ? (

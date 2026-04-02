@@ -101,4 +101,12 @@ export const fr: TranslationDictionary = {
     'welcome.ai.title': 'Générer avec l\'IA',
     'welcome.ai.desc': 'Décrivez votre email et laissez l\'IA le créer',
     'welcome.templates.title': 'Ou choisissez un modèle de départ',
+
+    'campaigns.templates.title': 'Modèles',
+    'campaigns.templates.subtitle': 'Choisissez un modèle et ouvrez-le dans l’éditeur.',
+    'campaigns.templates.startScratch': 'Partir de zéro',
+    'campaigns.templates.listTitle': 'Modèles de départ',
+    'campaigns.templates.listDescription': 'Sélectionnez une mise en page prête à l’emploi pour démarrer rapidement le contenu de votre campagne.',
+    'campaigns.templates.useTemplate': 'Utiliser le modèle',
+    'campaigns.templates.notFound': 'Modèle introuvable. Choisissez un autre modèle dans la liste.',
 };

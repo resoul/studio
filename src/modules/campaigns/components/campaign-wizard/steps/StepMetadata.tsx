@@ -2,7 +2,7 @@ import { useCallback, ChangeEvent } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CampaignFormData, CampaignType, StepErrors } from '@/types/campaign';
-import { Mail, FlaskConical, Zap } from 'lucide-react';
+import { Mail, FlaskConical, Zap, Rss } from 'lucide-react';
 
 interface StepMetadataProps {
     data: CampaignFormData;
@@ -35,6 +35,12 @@ const TYPE_OPTIONS: TypeOption[] = [
         label: 'Automated',
         description: 'Trigger-based sending',
         Icon: Zap,
+    },
+    {
+        value: 'rss',
+        label: 'RSS',
+        description: 'Auto-send from a feed',
+        Icon: Rss,
     },
 ];
 
@@ -77,7 +83,7 @@ export function StepMetadata({ data, errors, onChange }: StepMetadataProps) {
 
             <div className="space-y-1.5">
                 <Label>Campaign type</Label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {TYPE_OPTIONS.map(({ value, label, description, Icon }) => (
                         <button
                             key={value}
@@ -93,9 +99,7 @@ export function StepMetadata({ data, errors, onChange }: StepMetadataProps) {
                             <div
                                 className={[
                                     'flex h-7 w-7 items-center justify-center rounded-md transition-colors',
-                                    data.type === value
-                                        ? 'bg-primary/10'
-                                        : 'bg-secondary',
+                                    data.type === value ? 'bg-primary/10' : 'bg-secondary',
                                 ].join(' ')}
                             >
                                 <Icon className="h-4 w-4" />

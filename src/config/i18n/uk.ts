@@ -102,4 +102,12 @@ export const uk: TranslationDictionary = {
     'welcome.ai.title': 'Згенерувати з AI',
     'welcome.ai.desc': 'Опишіть лист, і AI створить його',
     'welcome.templates.title': 'Або виберіть базовий шаблон',
+
+    'campaigns.templates.title': 'Шаблони',
+    'campaigns.templates.subtitle': 'Оберіть шаблон і відкрийте його в редакторі.',
+    'campaigns.templates.startScratch': 'Почати з нуля',
+    'campaigns.templates.listTitle': 'Базові шаблони',
+    'campaigns.templates.listDescription': 'Оберіть готовий макет, щоб швидко почати роботу з контентом кампанії.',
+    'campaigns.templates.useTemplate': 'Використати шаблон',
+    'campaigns.templates.notFound': 'Шаблон не знайдено. Оберіть інший шаблон зі списку.',
 };

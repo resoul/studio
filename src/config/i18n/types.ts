@@ -101,4 +101,12 @@ export interface TranslationDictionary {
     'welcome.ai.title': string;
     'welcome.ai.desc': string;
     'welcome.templates.title': string;
+
+    'campaigns.templates.title': string;
+    'campaigns.templates.subtitle': string;
+    'campaigns.templates.startScratch': string;
+    'campaigns.templates.listTitle': string;
+    'campaigns.templates.listDescription': string;
+    'campaigns.templates.useTemplate': string;
+    'campaigns.templates.notFound': string;
 }

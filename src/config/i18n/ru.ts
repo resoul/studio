@@ -102,4 +102,12 @@ export const ru: TranslationDictionary = {
     'welcome.ai.title': 'Сгенерировать с AI',
     'welcome.ai.desc': 'Опишите письмо, и AI создаст его',
     'welcome.templates.title': 'Или выберите базовый шаблон',
+
+    'campaigns.templates.title': 'Шаблоны',
+    'campaigns.templates.subtitle': 'Выберите шаблон и откройте его в редакторе.',
+    'campaigns.templates.startScratch': 'Начать с нуля',
+    'campaigns.templates.listTitle': 'Базовые шаблоны',
+    'campaigns.templates.listDescription': 'Выберите готовый макет, чтобы быстро начать работу с контентом кампании.',
+    'campaigns.templates.useTemplate': 'Использовать шаблон',
+    'campaigns.templates.notFound': 'Шаблон не найден. Выберите другой шаблон из списка.',
 };

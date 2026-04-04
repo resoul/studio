@@ -36,6 +36,7 @@ import { Language } from '@/config/i18n/types';
 import { useTranslation } from '@/hooks/useTranslation';
 import { toAbsoluteUrl } from '@/lib/helpers';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/providers/auth-provider';
 
 interface Workspace {
   id: string;
@@ -82,8 +83,11 @@ export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHead
   const { sidebarCollapse, setSidebarCollapse } = useLayout();
   const { theme, setTheme } = useTheme();
     const navigate = useNavigate();
+    const { logout } = useAuth();
     const handleSettings   = useCallback(() => navigate('/settings/'), [navigate]);
-    const handleSignOut = useCallback(() => navigate('/auth/logout'), [navigate]);
+    const handleSignOut = useCallback(() => {
+        logout();
+    }, [logout]);
     const { t, language, setLanguage } = useTranslation();
     const currentLang = LANGUAGE_OPTIONS.find(l => l.code === language);
 

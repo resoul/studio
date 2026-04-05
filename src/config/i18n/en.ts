@@ -141,4 +141,13 @@ export const en: TranslationDictionary = {
     'layout.invites.column.createdAt': 'Sent At',
     'layout.invites.status.active': 'Active',
     'layout.invites.status.expired': 'Expired',
+    'layout.invites.resend': 'Resend',
+    'layout.invites.revoke': 'Revoke',
+    'layout.members.title': 'Team Members',
+    'layout.members.subtitle': 'Manage your team members and their permissions.',
+    'layout.members.activeMembers': 'Active Members',
+    'layout.members.pendingInvites': 'Pending Invitations',
+    'layout.members.remove': 'Remove',
+    'layout.members.removeConfirm': 'Are you sure you want to remove this member?',
+    'layout.members.removeSuccess': 'Member removed successfully',
 };

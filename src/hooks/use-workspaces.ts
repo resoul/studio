@@ -113,6 +113,25 @@ export const useWorkspaces = () => {
         },
     });
 
+    const resendInviteMutation = useMutation({
+        mutationFn: async ({ workspaceId, email }: { workspaceId: string; email: string }) => {
+            const { data } = await api.post<WorkspaceInvite>(`/workspaces/${workspaceId}/invites/resend`, { email });
+            return data;
+        },
+        onSuccess: (_, { workspaceId }) => {
+            queryClient.invalidateQueries({ queryKey: ['workspaces', workspaceId, 'invites'] });
+        },
+    });
+
+    const revokeInviteMutation = useMutation({
+        mutationFn: async ({ workspaceId, email }: { workspaceId: string; email: string }) => {
+            await api.delete(`/workspaces/${workspaceId}/invites/${email}`);
+        },
+        onSuccess: (_, { workspaceId }) => {
+            queryClient.invalidateQueries({ queryKey: ['workspaces', workspaceId, 'invites'] });
+        },
+    });
+
     const useInvites = (workspaceId?: string) => {
         return useQuery({
             queryKey: ['workspaces', workspaceId, 'invites'],
@@ -137,6 +156,8 @@ export const useWorkspaces = () => {
         updateWorkspace: updateWorkspaceMutation,
         updateConfig: updateConfigMutation.mutate,
         inviteUser: inviteUserMutation,
+        resendInvite: resendInviteMutation,
+        revokeInvite: revokeInviteMutation,
         useInvites,
     };
 };

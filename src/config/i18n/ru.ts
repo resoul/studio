@@ -141,4 +141,13 @@ export const ru: TranslationDictionary = {
     'layout.invites.column.createdAt': 'Отправлено',
     'layout.invites.status.active': 'Активно',
     'layout.invites.status.expired': 'Истекло',
+    'layout.invites.resend': 'Повторить',
+    'layout.invites.revoke': 'Отозвать',
+    'layout.members.title': 'Участники команды',
+    'layout.members.subtitle': 'Управляйте участниками вашей команды и их правами.',
+    'layout.members.activeMembers': 'Активные участники',
+    'layout.members.pendingInvites': 'Ожидающие приглашения',
+    'layout.members.remove': 'Удалить',
+    'layout.members.removeConfirm': 'Вы уверены, что хотите удалить этого участника?',
+    'layout.members.removeSuccess': 'Участник успешно удален',
 };

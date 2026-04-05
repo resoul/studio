@@ -20,6 +20,9 @@ import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useWorkspaces } from '@/hooks/use-workspaces';
 
+import { useAuth } from '@/hooks/use-auth';
+import { useCallback } from 'react';
+
 interface WorkspaceMenuItem {
   id: string;
   title: string;
@@ -36,14 +39,14 @@ const workspaceMenuItems: WorkspaceMenuItem[] = [
     title: 'Workspace Overview',
     description: 'Manage your workspace settings and preferences',
     icon: Building2,
-    href: '/dashboard/settings/workspace',
+    href: '/settings/workspace',
   },
   {
     id: 'members',
     title: 'Team Members',
     description: 'Invite, manage, and organize your team',
     icon: Users,
-    href: '/dashboard/settings/members',
+    href: '/settings/members',
     badge: '24',
     variant: 'secondary',
   },
@@ -52,7 +55,7 @@ const workspaceMenuItems: WorkspaceMenuItem[] = [
     title: 'Billing & Plans',
     description: 'Manage subscriptions, invoices, and payment methods',
     icon: CreditCard,
-    href: '/dashboard/settings/billing',
+    href: '/settings/billing',
     badge: 'Pro Plan',
     variant: 'primary',
   },
@@ -61,7 +64,7 @@ const workspaceMenuItems: WorkspaceMenuItem[] = [
     title: 'Integrations',
     description: 'Connect with third-party tools and services',
     icon: Zap,
-    href: '/dashboard/settings/integrations',
+    href: '/settings/integrations',
     badge: '8 Active',
     variant: 'success',
   },
@@ -70,28 +73,28 @@ const workspaceMenuItems: WorkspaceMenuItem[] = [
     title: 'Security & Privacy',
     description: 'Manage authentication, permissions, and data protection',
     icon: Shield,
-    href: '/dashboard/settings/security',
+    href: '/settings/security',
   },
   {
     id: 'appearance',
     title: 'Appearance',
     description: 'Customize themes, branding, and visual settings',
     icon: Palette,
-    href: '/dashboard/settings/appearance',
+    href: '/settings/appearance',
   },
   {
     id: 'notifications',
     title: 'Notifications',
     description: 'Configure email, push, and in-app notifications',
     icon: Bell,
-    href: '/dashboard/settings/notifications',
+    href: '/settings/notifications',
   },
   {
     id: 'regional',
     title: 'Regional Settings',
     description: 'Language, timezone, and localization preferences',
     icon: Globe,
-    href: '/dashboard/settings/regional',
+    href: '/settings/regional',
   },
 ];
 
@@ -103,6 +106,11 @@ export function SidebarWorkspace({ onSwitchToDefault }: SidebarWorkspaceProps) {
   const location = useLocation();
   const { t } = useTranslation();
   const { currentWorkspace } = useWorkspaces();
+  const { logout, profile } = useAuth();
+
+  const handleLogout = useCallback(() => {
+    logout();
+  }, [logout]);
 
   const getPlanBadgeVariant = (plan: string) => {
     switch (plan) {
@@ -182,12 +190,12 @@ export function SidebarWorkspace({ onSwitchToDefault }: SidebarWorkspaceProps) {
           return (
             <Link
               key={item.id}
-              to={item.id === 'overview' ? `/settings/workspace` : item.href}
+              to={item.href}
               className={cn(
                 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
                 'hover:bg-accent hover:text-accent-foreground',
                 isActive
-                  ? 'bg-accent text-accent-foreground'
+                   ? 'bg-accent text-accent-foreground'
                   : 'text-muted-foreground',
               )}
             >
@@ -211,12 +219,21 @@ export function SidebarWorkspace({ onSwitchToDefault }: SidebarWorkspaceProps) {
       <div className="flex items-center justify-between p-3 border-t border-border">
         <div className="flex items-center gap-2">
           <Avatar className="size-6">
-            <AvatarImage src="/media/avatars/300-2.png" alt="User" />
-            <AvatarFallback className="text-xs">JD</AvatarFallback>
+            <AvatarImage src={profile?.avatar_url} alt={`${profile?.first_name} ${profile?.last_name}`} />
+            <AvatarFallback className="text-xs uppercase">
+              {profile?.first_name?.[0]}{profile?.last_name?.[0]}
+            </AvatarFallback>
           </Avatar>
-          <span className="text-sm font-medium text-muted-foreground truncate max-w-[100px]">John Doe</span>
+          <span className="text-sm font-medium text-muted-foreground truncate max-w-[100px]">
+            {profile?.first_name} {profile?.last_name}
+          </span>
         </div>
-        <Button variant="ghost" size="sm" className="h-8 px-2">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="h-8 px-2"
+          onClick={handleLogout}
+        >
           <LogOut className="size-3 mr-2" />
           {t('layout.workspace.logout')}
         </Button>
@@ -224,3 +241,4 @@ export function SidebarWorkspace({ onSwitchToDefault }: SidebarWorkspaceProps) {
     </>
   );
 }
+

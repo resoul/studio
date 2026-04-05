@@ -140,4 +140,13 @@ export interface TranslationDictionary {
     'layout.invites.column.createdAt': string;
     'layout.invites.status.active': string;
     'layout.invites.status.expired': string;
+    'layout.invites.resend': string;
+    'layout.invites.revoke': string;
+    'layout.members.title': string;
+    'layout.members.subtitle': string;
+    'layout.members.activeMembers': string;
+    'layout.members.pendingInvites': string;
+    'layout.members.remove': string;
+    'layout.members.removeConfirm': string;
+    'layout.members.removeSuccess': string;
 }

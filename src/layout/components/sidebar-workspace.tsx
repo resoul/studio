@@ -5,7 +5,6 @@ import {
   CheckCircle,
   ChevronLeft,
   CreditCard,
-  Crown,
   Globe,
   LogOut,
   Palette,
@@ -19,16 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/hooks/useTranslation';
-
-interface Workspace {
-  id: string;
-  name: string;
-  logo?: string;
-  plan: 'free' | 'pro' | 'enterprise';
-  status: 'active' | 'suspended' | 'trial';
-  members: number;
-  role: 'owner' | 'admin' | 'member';
-}
+import { useWorkspaces } from '@/hooks/use-workspaces';
 
 interface WorkspaceMenuItem {
   id: string;
@@ -37,25 +27,8 @@ interface WorkspaceMenuItem {
   icon: React.ComponentType<{ className?: string }>;
   href: string;
   badge?: string;
-  variant?:
-    | 'primary'
-    | 'secondary'
-    | 'destructive'
-    | 'outline'
-    | 'success'
-    | 'warning'
-    | 'info';
+  variant?: 'primary' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' | 'info';
 }
-
-const mockWorkspace: Workspace = {
-  id: '1',
-  name: 'Acme Corporation',
-  logo: '/media/brand-logos/acme.svg',
-  plan: 'pro',
-  status: 'active',
-  members: 24,
-  role: 'owner',
-};
 
 const workspaceMenuItems: WorkspaceMenuItem[] = [
   {
@@ -72,6 +45,7 @@ const workspaceMenuItems: WorkspaceMenuItem[] = [
     icon: Users,
     href: '/dashboard/settings/members',
     badge: '24',
+    variant: 'secondary',
   },
   {
     id: 'billing',
@@ -80,6 +54,7 @@ const workspaceMenuItems: WorkspaceMenuItem[] = [
     icon: CreditCard,
     href: '/dashboard/settings/billing',
     badge: 'Pro Plan',
+    variant: 'primary',
   },
   {
     id: 'integrations',
@@ -88,6 +63,7 @@ const workspaceMenuItems: WorkspaceMenuItem[] = [
     icon: Zap,
     href: '/dashboard/settings/integrations',
     badge: '8 Active',
+    variant: 'success',
   },
   {
     id: 'security',
@@ -126,6 +102,7 @@ interface SidebarWorkspaceProps {
 export function SidebarWorkspace({ onSwitchToDefault }: SidebarWorkspaceProps) {
   const location = useLocation();
   const { t } = useTranslation();
+  const { currentWorkspace } = useWorkspaces();
 
   const getPlanBadgeVariant = (plan: string) => {
     switch (plan) {
@@ -148,6 +125,8 @@ export function SidebarWorkspace({ onSwitchToDefault }: SidebarWorkspaceProps) {
         return <AlertCircle className="size-3 text-red-500" />;
     }
   };
+
+  if (!currentWorkspace) return null;
 
   return (
     <>
@@ -172,37 +151,30 @@ export function SidebarWorkspace({ onSwitchToDefault }: SidebarWorkspaceProps) {
       <div className="p-3 border-b border-border">
         <div className="flex items-center gap-2 mb-2">
           <Avatar className="size-8">
-            <AvatarImage src={mockWorkspace.logo} alt={mockWorkspace.name} />
+            <AvatarImage src={currentWorkspace.logo_url} alt={currentWorkspace.name} />
             <AvatarFallback className="text-sm font-semibold">
-              {mockWorkspace.name
-                .split(' ')
-                .map((n) => n[0])
-                .join('')}
+               {currentWorkspace.name[0]}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
             <h3 className="font-medium text-sm truncate">
-              {mockWorkspace.name}
+              {currentWorkspace.name}
             </h3>
             <div className="flex items-center gap-1 mt-0.5">
               <Badge
-                variant={getPlanBadgeVariant(mockWorkspace.plan)}
+                variant={getPlanBadgeVariant('pro')} // Mocking plan for now
                 size="sm"
               >
-                {mockWorkspace.plan === 'enterprise' && (
-                  <Crown className="size-3 mr-1" />
-                )}
-                {mockWorkspace.plan.charAt(0).toUpperCase() +
-                  mockWorkspace.plan.slice(1)}
+                Pro
               </Badge>
-              {getStatusIcon(mockWorkspace.status)}
+              {getStatusIcon('active')}
             </div>
           </div>
         </div>
       </div>
 
       {/* Navigation Menu - Same style as default sidebar */}
-      <nav className="flex-1 p-2 space-y-1">
+      <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
         {workspaceMenuItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.href;
@@ -210,7 +182,7 @@ export function SidebarWorkspace({ onSwitchToDefault }: SidebarWorkspaceProps) {
           return (
             <Link
               key={item.id}
-              to={item.href}
+              to={item.id === 'overview' ? `/settings/workspace` : item.href}
               className={cn(
                 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
                 'hover:bg-accent hover:text-accent-foreground',
@@ -242,9 +214,9 @@ export function SidebarWorkspace({ onSwitchToDefault }: SidebarWorkspaceProps) {
             <AvatarImage src="/media/avatars/300-2.png" alt="User" />
             <AvatarFallback className="text-xs">JD</AvatarFallback>
           </Avatar>
-          <span className="text-sm font-medium">John Doe</span>
+          <span className="text-sm font-medium text-muted-foreground truncate max-w-[100px]">John Doe</span>
         </div>
-        <Button variant="ghost" size="sm">
+        <Button variant="ghost" size="sm" className="h-8 px-2">
           <LogOut className="size-3 mr-2" />
           {t('layout.workspace.logout')}
         </Button>

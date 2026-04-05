@@ -41,6 +41,33 @@ export const useWorkspaces = () => {
         },
     });
 
+    const createWorkspaceMutation = useMutation({
+        mutationFn: async (formData: FormData) => {
+            const { data } = await api.post<Workspace>('/workspaces', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+        },
+    });
+
+    const updateWorkspaceMutation = useMutation({
+        mutationFn: async ({ id, formData }: { id: string; formData: FormData }) => {
+            const { data } = await api.patch<Workspace>(`/workspaces/${id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return data;
+        },
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+            if (data.id === currentWorkspaceQuery.data?.id) {
+                queryClient.invalidateQueries({ queryKey: ['workspaces', 'current'] });
+            }
+        },
+    });
+
     return {
         workspaces: workspacesQuery.data || [],
         currentWorkspace: currentWorkspaceQuery.data,
@@ -48,5 +75,7 @@ export const useWorkspaces = () => {
         isError: workspacesQuery.isError || currentWorkspaceQuery.isError,
         switchWorkspace: switchWorkspaceMutation.mutate,
         isSwitching: switchWorkspaceMutation.isPending,
+        createWorkspace: createWorkspaceMutation,
+        updateWorkspace: updateWorkspaceMutation,
     };
 };

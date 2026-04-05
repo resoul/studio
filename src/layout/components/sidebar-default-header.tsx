@@ -191,7 +191,7 @@ export function SidebarDefaultHeader({ onSwitchToWorkspace }: SidebarDefaultHead
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/workspaces/new')}>
                 <Plus className="size-4" />
                 <span>{t('layout.sidebar.newWorkspace')}</span>
               </DropdownMenuItem>

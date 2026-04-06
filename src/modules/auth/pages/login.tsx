@@ -15,29 +15,21 @@ const LoginPage = () => {
     const { user, isVerified, isLoading: isAuthLoading, logout } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const returnTo = searchParams.get('return_to') || '';
+    const returnTo = searchParams.get('return_to') ?? '';
     const message = searchParams.get('message');
 
     useEffect(() => {
         if (isAuthLoading) return;
 
-        console.log('[LoginPage] user:', !!user, 'isVerified:', isVerified);
-
-        // If logged in and verified → go to dashboard
         if (user && isVerified) {
-            console.log('[LoginPage] Redirecting to dashboard');
             navigate(returnTo || '/dashboard', { replace: true });
             return;
         }
 
-        // If logged in but not verified → show unverified UI, don't try to create a flow
         if (user && !isVerified) {
-            console.log('[LoginPage] User unverified, showing notice UI');
             return;
         }
 
-        // Not logged in → create login flow
-        console.log('[LoginPage] Creating login flow');
         kratos
             .createBrowserLoginFlow({ returnTo })
             .then(({ data }) => setFlow(data))
@@ -60,8 +52,8 @@ const LoginPage = () => {
                 } as UpdateLoginFlowBody,
             })
             .then(() => {
-                const redirectUrl = returnTo || '/dashboard';
-                window.location.href = redirectUrl;
+                // Use return_to if present, otherwise dashboard
+                window.location.href = returnTo || '/dashboard';
             })
             .catch((err) => {
                 if (err.response?.status === 400) {
@@ -74,7 +66,6 @@ const LoginPage = () => {
 
     if (isAuthLoading) return null;
 
-    // User is logged in but not verified — show a blocking notice
     if (user && !isVerified) {
         return (
             <div className="flex h-screen items-center justify-center p-4">
@@ -90,14 +81,18 @@ const LoginPage = () => {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-3">
-                        <Button onClick={() => navigate('/auth/verification')} className="w-full">
+                        <Button
+                            onClick={() => {
+                                const verifyHref = returnTo
+                                    ? `/auth/verification?return_to=${encodeURIComponent(returnTo)}`
+                                    : '/auth/verification';
+                                navigate(verifyHref);
+                            }}
+                            className="w-full"
+                        >
                             Go to Verification
                         </Button>
-                        <Button
-                            variant="outline"
-                            className="w-full"
-                            onClick={logout}
-                        >
+                        <Button variant="outline" className="w-full" onClick={logout}>
                             Log out and use a different account
                         </Button>
                     </CardContent>
@@ -128,7 +123,10 @@ const LoginPage = () => {
                 <CardContent>
                     <KratosForm ui={flow.ui} onSubmit={handleSubmit} />
                     <div className="mt-4 flex flex-col items-center gap-2 text-sm text-muted-foreground">
-                        <Link to="/auth/registration" className="text-primary hover:underline font-medium">
+                        <Link
+                            to={returnTo ? `/auth/registration?return_to=${encodeURIComponent(returnTo)}` : '/auth/registration'}
+                            className="text-primary hover:underline font-medium"
+                        >
                             Don't have an account? Sign up
                         </Link>
                         <Link to="/auth/recovery" className="hover:underline">

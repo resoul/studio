@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { ScreenLoader } from './screen-loader';
 
 export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
-    const { user, profile, isLoading, isVerified, isOnboarded } = useAuth();
+    const { user, isLoading, isVerified, isOnboarded } = useAuth();
     const location = useLocation();
 
     if (isLoading) {
@@ -12,12 +12,10 @@ export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     }
 
     if (!user) {
-        // Redirect to login if not authenticated
-        return <Navigate to="/auth/login" state={{ from: location }} replace />;
+        return <Navigate to={`/auth/login?return_to=${encodeURIComponent(location.pathname)}`} replace />;
     }
 
     if (!isVerified) {
-        // Redirect to verification if authenticated but not verified
         if (location.pathname.startsWith('/auth')) {
             return <>{children}</>;
         }
@@ -25,11 +23,18 @@ export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     }
 
     if (!isOnboarded) {
-        // Redirect to onboarding if verified but not yet onboarded
         if (location.pathname.startsWith('/onboarding')) {
             return <>{children}</>;
         }
-        return <Navigate to="/onboarding" replace />;
+        // If user has a pending invite, preserve it through onboarding
+        const returnTo = new URLSearchParams(location.search).get('return_to') ?? location.pathname;
+        const isInvitePath = returnTo.startsWith('/invites/') || location.pathname.startsWith('/invites/');
+        return (
+            <Navigate
+                to={`/onboarding/profile${isInvitePath ? `?return_to=${encodeURIComponent(returnTo)}` : ''}`}
+                replace
+            />
+        );
     }
 
     return <>{children}</>;

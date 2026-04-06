@@ -13,7 +13,7 @@ const RegistrationPage = () => {
     const { user, isVerified, isLoading: isAuthLoading } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const returnTo = searchParams.get('return_to') || '';
+    const returnTo = searchParams.get('return_to') ?? '';
 
     useEffect(() => {
         if (isAuthLoading) return;
@@ -43,10 +43,7 @@ const RegistrationPage = () => {
                 } as UpdateRegistrationFlowBody,
             })
             .then(() => {
-                // If we get here, it means registration was successful
-                // Kratos will trigger email verification automatically if configured
-                console.log('Registration success');
-                setFlow(null); // Clear flow to show success message
+                setFlow(null);
             })
             .catch((err) => {
                 if (err.response?.status === 400) {
@@ -61,6 +58,10 @@ const RegistrationPage = () => {
 
     if (!flow && !user) {
         const isInvite = returnTo.includes('/invites/');
+        // Build login link that preserves return_to
+        const loginHref = returnTo
+            ? `/auth/login?return_to=${encodeURIComponent(returnTo)}`
+            : '/auth/login';
 
         return (
             <div className="flex h-screen items-center justify-center p-4">
@@ -70,14 +71,14 @@ const RegistrationPage = () => {
                             {isInvite ? 'Almost there!' : 'Check your email'}
                         </CardTitle>
                         <CardDescription>
-                            {isInvite 
+                            {isInvite
                                 ? "Please check your email to verify your account. After verification, you'll be redirected back to accept your workspace invitation."
                                 : "We've sent you a verification link. Please check your inbox and follow the instructions to complete your registration."}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Button asChild className="w-full">
-                            <Link to="/auth/login">Back to Login</Link>
+                            <Link to={loginHref}>Back to Login</Link>
                         </Button>
                     </CardContent>
                 </Card>
@@ -100,7 +101,10 @@ const RegistrationPage = () => {
                     <KratosForm ui={flow.ui} onSubmit={handleSubmit} />
                     <div className="mt-4 text-center text-sm">
                         Already have an account?{' '}
-                        <Link to="/auth/login" className="text-primary hover:underline">
+                        <Link
+                            to={returnTo ? `/auth/login?return_to=${encodeURIComponent(returnTo)}` : '/auth/login'}
+                            className="text-primary hover:underline"
+                        >
                             Login
                         </Link>
                     </div>

@@ -11,6 +11,7 @@ const VerificationPage = () => {
     const navigate = useNavigate();
     const flowId = searchParams.get('flow');
     const code = searchParams.get('code');
+    const returnTo = searchParams.get('return_to') ?? '';
 
     useEffect(() => {
         if (flowId) {
@@ -28,25 +29,26 @@ const VerificationPage = () => {
 
     useEffect(() => {
         if (flow && code) {
-            // Automatically submit if code is present in URL
             handleSubmit(code);
         }
     }, [flow, code]);
 
     const handleSubmit = (codeValue?: string) => {
-        const body: UpdateVerificationFlowBody = codeValue 
-            ? { method: 'code', code: codeValue } 
-            : { method: 'code' }; // Fallback if called without code, though UI usually provides it
-        
+        const body: UpdateVerificationFlowBody = codeValue
+            ? { method: 'code', code: codeValue }
+            : { method: 'code' };
+
         kratos
             .updateVerificationFlow({
                 flow: flow?.id || '',
                 updateVerificationFlowBody: body,
             })
             .then(() => {
-                // Verification success!
-                // Per user request: redirect to login
-                navigate('/auth/login?message=verification_success');
+                // Preserve return_to so invite flow survives verification
+                const next = returnTo
+                    ? `/auth/login?return_to=${encodeURIComponent(returnTo)}&message=verification_success`
+                    : '/auth/login?message=verification_success';
+                navigate(next);
             })
             .catch((err) => {
                 if (err.response?.status === 400) {
@@ -78,7 +80,10 @@ const VerificationPage = () => {
                         }}
                     />
                     <div className="mt-4 text-center text-sm">
-                        <Link to="/auth/login" className="text-primary hover:underline">
+                        <Link
+                            to={returnTo ? `/auth/login?return_to=${encodeURIComponent(returnTo)}` : '/auth/login'}
+                            className="text-primary hover:underline"
+                        >
                             Back to Login
                         </Link>
                     </div>

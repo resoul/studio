@@ -1,14 +1,14 @@
-import { useCallback, useMemo } from 'react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useWorkspaces } from '@/hooks/use-workspaces';
-import { useChat, useMessages } from '@/hooks/use-chat';
-import { useAuth } from '@/hooks/use-auth';
-import { useChatNavigation } from '@/hooks/use-chat-navigation';
-import { ChatSidebar } from '../components/sidebar';
-import { MessageList } from '../components/message-list';
-import { MessageInput } from '../components/message-input';
-import { Content } from '@/layout/components/content';
-import { Hash, MessageSquare } from 'lucide-react';
+import {useCallback, useMemo} from 'react';
+import {useTranslation} from '@/hooks/useTranslation';
+import {useWorkspaces} from '@/hooks/use-workspaces';
+import {useChat, useMessages} from '@/hooks/use-chat';
+import {useAuth} from '@/hooks/use-auth';
+import {useChatNavigation} from '@/hooks/use-chat-navigation';
+import {ChatSidebar} from '../components/sidebar';
+import {MessageList} from '../components/message-list';
+import {MessageInput} from '../components/message-input';
+import {Content} from '@/layout/components/content';
+import {Hash, MessageSquare} from 'lucide-react';
 
 export default function ChatPage() {
     const { t } = useTranslation();
@@ -16,8 +16,6 @@ export default function ChatPage() {
     const { user } = useAuth();
     const { activeChat, navigateToChat } = useChatNavigation();
     const { channels, conversations, sendMessage } = useChat(currentWorkspace?.id);
-
-    // useMessages is now a top-level hook — no rules-of-hooks violation
     const { data: messages = [] } = useMessages(currentWorkspace?.id, activeChat?.id);
 
     const handleSelect = useCallback((id: string, isChannel: boolean) => {
@@ -39,9 +37,7 @@ export default function ChatPage() {
         }
         const conv = conversations.find(c => c.id === activeChat.id);
         if (!conv) return '';
-        // Resolve name via members in MessageList / sidebar — for header use other user id as fallback
-        const otherUserId = conv.user1_id === user?.id ? conv.user2_id : conv.user1_id;
-        return otherUserId;
+        return conv.user1_id === user?.id ? conv.user2_id : conv.user1_id;
     }, [activeChat, channels, conversations, user?.id]);
 
     return (

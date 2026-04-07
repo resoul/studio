@@ -4,7 +4,7 @@ import axios from 'axios';
 import { kratos } from '@/lib/kratos';
 import api from '@/lib/api';
 import { AuthContext } from './auth-context';
-import { ApiUserResult, UserProfile, UserVerifiableAddress } from '@/types/auth';
+import { ApiUserMeResponse, ApiUserResult, UserProfile, UserVerifiableAddress } from '@/types/auth';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const {
@@ -15,11 +15,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         queryKey: ['api-user'],
         queryFn: async (): Promise<ApiUserResult> => {
             try {
-                const { data: res } = await api.get<any>('/user/me');
+                const { data: res } = await api.get<ApiUserMeResponse>('/user/me');
                 const userData = res.identity;
                 const profile = res.profile;
                 const workspaces = res.workspaces;
-                const onboarded = res.onboarded;
+                const profileCompleted = res.profile_completed ?? profile?.completed ?? false;
+                const hasWorkspaces = res.has_workspaces ?? ((workspaces?.length ?? 0) > 0);
+                const pendingInvites = res.pending_invites ?? [];
+                const onboarded = res.onboarded ?? (profileCompleted && hasWorkspaces);
 
                 const verified = userData?.verifiable_addresses?.some((a: UserVerifiableAddress) => a.verified) ?? false;
                 
@@ -27,6 +30,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     user: userData, 
                     profile, 
                     workspaces,
+                    pendingInvites,
+                    profileCompleted,
+                    hasWorkspaces,
                     isVerified: verified, 
                     isOnboarded: onboarded 
                 };
@@ -34,11 +40,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 if (axios.isAxiosError(err)) {
                     const status = err.response?.status;
                     if (status === 401) {
-                        return { user: null, isVerified: false, isOnboarded: false };
+                        return {
+                            user: null,
+                            pendingInvites: [],
+                            profileCompleted: false,
+                            hasWorkspaces: false,
+                            isVerified: false,
+                            isOnboarded: false,
+                        };
                     }
                     if (status === 403) {
                         const userFromRes = (err.response?.data as { user?: UserProfile })?.user ?? null;
-                        return { user: userFromRes, isVerified: false, isOnboarded: false };
+                        return {
+                            user: userFromRes,
+                            pendingInvites: [],
+                            profileCompleted: false,
+                            hasWorkspaces: false,
+                            isVerified: false,
+                            isOnboarded: false,
+                        };
                     }
                 }
                 throw err;
@@ -62,6 +82,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 user: data?.user ?? null,
                 profile: data?.profile,
                 workspaces: data?.workspaces,
+                pendingInvites: data?.pendingInvites ?? [],
+                profileCompleted: data?.profileCompleted ?? false,
+                hasWorkspaces: data?.hasWorkspaces ?? false,
                 isLoading,
                 isError,
                 isVerified: data?.isVerified ?? false,

@@ -6,9 +6,9 @@ import OnboardingWorkspaceSelectPage from './pages/workspace-select/page';
 export default function OnboardingRoutes() {
     return (
         <Routes>
-            <Route path="/profile" element={<OnboardingProfilePage />} />
-            <Route path="/workspace" element={<OnboardingWorkspacePage />} />
-            <Route path="/workspace-select" element={<OnboardingWorkspaceSelectPage />} />
+            <Route path="profile" element={<OnboardingProfilePage />} />
+            <Route path="workspace" element={<OnboardingWorkspacePage />} />
+            <Route path="workspace-select" element={<OnboardingWorkspaceSelectPage />} />
             <Route index element={<Navigate to="/onboarding/profile" replace />} />
         </Routes>
     );

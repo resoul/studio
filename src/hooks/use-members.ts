@@ -10,6 +10,7 @@ export interface MemberInfo {
   first_name: string;
   last_name: string;
   avatar_url: string;
+  last_seen_at?: string | null;
 }
 
 export const useMembers = (workspaceId?: string) => {

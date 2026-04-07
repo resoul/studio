@@ -4,7 +4,14 @@ import { useAuth } from '@/hooks/use-auth';
 import { ScreenLoader } from './screen-loader';
 
 export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
-    const { user, isLoading, isVerified, isOnboarded } = useAuth();
+    const {
+        user,
+        isLoading,
+        isVerified,
+        isOnboarded,
+        profileCompleted,
+        hasWorkspaces,
+    } = useAuth();
     const location = useLocation();
 
     if (isLoading) {
@@ -23,18 +30,32 @@ export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
     }
 
     if (!isOnboarded) {
-        if (location.pathname.startsWith('/onboarding')) {
-            return <>{children}</>;
-        }
-        // If user has a pending invite, preserve it through onboarding
         const returnTo = new URLSearchParams(location.search).get('return_to') ?? location.pathname;
         const isInvitePath = returnTo.startsWith('/invites/') || location.pathname.startsWith('/invites/');
-        return (
-            <Navigate
-                to={`/onboarding/profile${isInvitePath ? `?return_to=${encodeURIComponent(returnTo)}` : ''}`}
-                replace
-            />
-        );
+
+        if (!profileCompleted) {
+            if (location.pathname.startsWith('/onboarding/profile')) {
+                return <>{children}</>;
+            }
+            return (
+                <Navigate
+                    to={`/onboarding/profile${isInvitePath ? `?return_to=${encodeURIComponent(returnTo)}` : ''}`}
+                    replace
+                />
+            );
+        }
+
+        if (!hasWorkspaces) {
+            if (location.pathname.startsWith('/onboarding/workspace')) {
+                return <>{children}</>;
+            }
+            return <Navigate to="/onboarding/workspace" replace />;
+        }
+
+        if (location.pathname.startsWith('/onboarding/workspace-select')) {
+            return <>{children}</>;
+        }
+        return <Navigate to="/onboarding/workspace-select" replace />;
     }
 
     return <>{children}</>;

@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { ScreenLoader } from '@/components/screen-loader';
 import { ProtectedRoute } from '@/components/protected-route';
 import { GlobalChatNotifications } from '@/components/global-chat-notifications';
+import { GlobalInviteRealtimeSync } from '@/components/global-invite-realtime-sync';
 
 const DashboardModule = lazy(() => import('@/modules/dashboard'));
 const FormModule = lazy(() => import('@/modules/forms'));
@@ -33,6 +34,7 @@ export function ModulesProvider() {
                 returns nothing until auth resolves).
             */}
             <GlobalChatNotifications />
+            <GlobalInviteRealtimeSync />
 
             <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />

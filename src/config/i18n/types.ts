@@ -62,6 +62,7 @@ export interface TranslationDictionary {
     'layout.notifications.tab.inbox': string;
     'layout.notifications.tab.team': string;
     'layout.notifications.tab.following': string;
+    'layout.notifications.tab.invite': string;
     'layout.notifications.inviteUsers': string;
     'layout.notifications.teamSettings': string;
     'layout.notifications.findMembers': string;
@@ -91,6 +92,10 @@ export interface TranslationDictionary {
     'layout.chat.send': string;
     'chat.channels': string;
     'chat.directMessages': string;
+    'chat.messages': string;
+    'chat.group': string;
+    'chat.groupName': string;
+    'chat.createGroup': string;
     'chat.typeMessage': string;
     'chat.welcome': string;
     'chat.selectChannel': string;
@@ -102,6 +107,13 @@ export interface TranslationDictionary {
     'chat.directMessage': string;
     'chat.searchMembers': string;
     'chat.members': string;
+    'chat.you': string;
+    'chat.reply': string;
+    'chat.replyInThread': string;
+    'chat.thread': string;
+    'chat.repliesCount': string;
+    'chat.reactWith': string;
+    'chat.empty': string;
 
     'layout.secondaryHeader.workspace': string;
     'layout.workspace.backToCrm': string;
@@ -139,6 +151,15 @@ export interface TranslationDictionary {
     'onboarding.workspace.invitationTitle': string;
     'onboarding.workspace.invitationDescription': string;
     'onboarding.workspace.accept': string;
+    'onboarding.workspace.pendingInvitesTitle': string;
+    'onboarding.workspace.pendingInvitesDescription': string;
+    'onboarding.workspace.inviteRole': string;
+    'onboarding.workspace.inviteExpires': string;
+    'onboarding.workspace.join': string;
+    'onboarding.workspace.joining': string;
+    'onboarding.workspace.joinSuccess': string;
+    'onboarding.workspace.joinError': string;
+    'onboarding.workspace.orCreate': string;
 
     'layout.invite.title': string;
     'layout.invite.email': string;
@@ -162,6 +183,10 @@ export interface TranslationDictionary {
     'layout.members.subtitle': string;
     'layout.members.activeMembers': string;
     'layout.members.pendingInvites': string;
+    'layout.members.lastSeen': string;
+    'layout.members.onlineNow': string;
+    'layout.members.neverSeen': string;
+    'layout.members.lastSeenPrefix': string;
     'layout.members.remove': string;
     'layout.members.removeConfirm': string;
     'layout.members.removeSuccess': string;

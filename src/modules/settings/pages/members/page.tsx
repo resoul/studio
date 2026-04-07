@@ -43,6 +43,7 @@ import { toast } from 'sonner';
 import { Content } from '@/layout/components/content';
 import { PageHeader } from "@/modules/settings/pages/members/page-header";
 import { SettingsSheet } from '../../components/settings-sheet';
+import { formatDistanceToNowStrict } from 'date-fns';
 
 export default function MembersPage() {
   const { t } = useTranslation();
@@ -68,7 +69,7 @@ export default function MembersPage() {
       toast.success(t('layout.invite.success'));
       setInviteEmail('');
       setIsInviteOpen(false);
-    } catch (err) {
+    } catch {
       toast.error('Failed to send invitation');
     }
   }, [currentWorkspace, inviteEmail, inviteRole, inviteUser, t]);
@@ -78,7 +79,7 @@ export default function MembersPage() {
     try {
       await resendInvite.mutateAsync({ workspaceId: currentWorkspace.id, email });
       toast.success(t('layout.invite.success'));
-    } catch (err) {
+    } catch {
       toast.error('Failed to resend invitation');
     }
   }, [currentWorkspace, resendInvite, t]);
@@ -88,7 +89,7 @@ export default function MembersPage() {
     try {
       await revokeInvite.mutateAsync({ workspaceId: currentWorkspace.id, email });
       toast.success('Invitation revoked');
-    } catch (err) {
+    } catch {
       toast.error('Failed to revoke invitation');
     }
   }, [currentWorkspace, revokeInvite]);
@@ -98,10 +99,20 @@ export default function MembersPage() {
     try {
       await removeMember.mutateAsync(userId);
       toast.success(t('layout.members.removeSuccess'));
-    } catch (err) {
+    } catch {
       toast.error('Failed to remove member');
     }
   }, [removeMember, t]);
+
+  const formatLastSeen = useCallback((userId: string, lastSeenAt?: string | null) => {
+    if (isOnline(userId)) {
+      return t('layout.members.onlineNow');
+    }
+    if (!lastSeenAt) {
+      return t('layout.members.neverSeen');
+    }
+    return `${t('layout.members.lastSeenPrefix')} ${formatDistanceToNowStrict(new Date(lastSeenAt), { addSuffix: true })}`;
+  }, [isOnline, t]);
 
   return (
     <>
@@ -138,7 +149,11 @@ export default function MembersPage() {
                                     <Label htmlFor="role">{t('layout.invite.role')}</Label>
                                     <Select
                                         value={inviteRole}
-                                        onValueChange={(v: any) => setInviteRole(v)}
+                                        onValueChange={(value) => {
+                                            if (value === 'admin' || value === 'member') {
+                                                setInviteRole(value);
+                                            }
+                                        }}
                                     >
                                         <SelectTrigger>
                                             <SelectValue />
@@ -169,6 +184,7 @@ export default function MembersPage() {
                                     <TableHead>{t('layout.sidebar.profile')}</TableHead>
                                     <TableHead>{t('layout.invite.email')}</TableHead>
                                     <TableHead>{t('layout.invite.role')}</TableHead>
+                                    <TableHead>{t('layout.members.lastSeen')}</TableHead>
                                     <TableHead className="w-[100px] text-right"></TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -198,6 +214,9 @@ export default function MembersPage() {
                                             <Badge variant={member.role === 'admin' ? 'primary' : 'secondary'}>
                                                 {member.role === 'admin' ? t('layout.invite.role.admin') : t('layout.invite.role.member')}
                                             </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-sm text-muted-foreground">
+                                            {formatLastSeen(member.user_id, member.last_seen_at)}
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <DropdownMenu>

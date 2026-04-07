@@ -1,7 +1,12 @@
-import { ReactNode } from 'react';
+import { MouseEvent, ReactNode, useCallback } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Calendar, Settings, Settings2, Shield, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
+import api from '@/lib/api';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,9 +45,45 @@ import Item18 from './notifications/item-18';
 import Item19 from './notifications/item-19';
 import Item20 from './notifications/item-20';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useAuth } from '@/hooks/use-auth';
+import { getActivePendingInvites } from './notifications/get-active-pending-invites';
 
 export function NotificationsSheet({ trigger }: { trigger: ReactNode }) {
   const { t } = useTranslation();
+  const { pendingInvites } = useAuth();
+  const queryClient = useQueryClient();
+  const activeInvites = getActivePendingInvites(pendingInvites);
+  const hasActiveInvites = activeInvites.length > 0;
+
+  const { mutate: acceptInvite, isPending: isAcceptInvitePending } = useMutation({
+    mutationFn: async (token: string) => {
+      await api.post(`/workspaces/invites/${token}/accept`);
+    },
+    onSuccess: async () => {
+      toast.success(t('onboarding.workspace.joinSuccess'));
+      await queryClient.invalidateQueries({ queryKey: ['api-user'] });
+      await queryClient.invalidateQueries({ queryKey: ['workspaces'] });
+      await queryClient.invalidateQueries({ queryKey: ['workspaces', 'current'] });
+    },
+    onError: () => {
+      toast.error(t('onboarding.workspace.joinError'));
+    },
+  });
+
+  const handleAcceptInvite = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    const token = event.currentTarget.dataset.token;
+    if (!token) {
+      return;
+    }
+    acceptInvite(token);
+  }, [acceptInvite]);
+
+  const getRoleLabel = useCallback((role: string) => {
+    if (role === 'admin') {
+      return t('layout.invite.role.admin');
+    }
+    return t('layout.invite.role.member');
+  }, [t]);
 
   return (
     <Sheet>
@@ -62,6 +103,12 @@ export function NotificationsSheet({ trigger }: { trigger: ReactNode }) {
                 </TabsTrigger>
                 <TabsTrigger value="team">{t('layout.notifications.tab.team')}</TabsTrigger>
                 <TabsTrigger value="following">{t('layout.notifications.tab.following')}</TabsTrigger>
+                {hasActiveInvites && (
+                  <TabsTrigger value="invite" className="relative">
+                    {t('layout.notifications.tab.invite')}
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 absolute top-1 -end-1" />
+                  </TabsTrigger>
+                )}
                 <div className="grow flex items-center justify-end">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -275,6 +322,43 @@ export function NotificationsSheet({ trigger }: { trigger: ReactNode }) {
                   />
                 </div>
               </TabsContent>
+
+              {hasActiveInvites && (
+                <TabsContent value="invite" className="mt-0">
+                  <div className="flex flex-col gap-3 px-5">
+                    {activeInvites.map((invite) => (
+                      <div key={invite.token} className="rounded-md border p-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium">
+                              {invite.workspace_name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {t('onboarding.workspace.inviteRole')}: {getRoleLabel(invite.role)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {t('onboarding.workspace.inviteExpires')}: {format(new Date(invite.expires_at), 'PPP p')}
+                            </p>
+                          </div>
+                          <Badge variant="success" className="bg-emerald-500 hover:bg-emerald-600 text-white">
+                            {t('layout.invites.status.active')}
+                          </Badge>
+                        </div>
+                        <div className="mt-3 flex justify-end">
+                          <Button
+                            size="sm"
+                            data-token={invite.token}
+                            onClick={handleAcceptInvite}
+                            disabled={isAcceptInvitePending}
+                          >
+                            {isAcceptInvitePending ? t('onboarding.workspace.joining') : t('onboarding.workspace.join')}
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </TabsContent>
+              )}
             </Tabs>
           </ScrollArea>
         </SheetBody>

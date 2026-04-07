@@ -41,10 +41,34 @@ export interface Workspace {
   logo_url: string;
 }
 
+export interface PendingWorkspaceInvite {
+  token: string;
+  workspace_id: string;
+  workspace_name: string;
+  workspace_slug: string;
+  workspace_logo: string;
+  role: string;
+  expires_at: string;
+  created_at: string;
+}
+
+export interface ApiUserMeResponse {
+  identity: UserProfile;
+  profile?: Profile;
+  workspaces?: Workspace[];
+  onboarded?: boolean;
+  profile_completed?: boolean;
+  has_workspaces?: boolean;
+  pending_invites?: PendingWorkspaceInvite[];
+}
+
 export interface ApiUserResult {
   user: UserProfile | null;
   profile?: Profile;
   workspaces?: Workspace[];
+  pendingInvites: PendingWorkspaceInvite[];
+  profileCompleted: boolean;
+  hasWorkspaces: boolean;
   isVerified: boolean;
   isOnboarded: boolean;
 }
@@ -53,6 +77,9 @@ export interface AuthContextType {
   user: UserProfile | null;
   profile?: Profile;
   workspaces?: Workspace[];
+  pendingInvites: PendingWorkspaceInvite[];
+  profileCompleted: boolean;
+  hasWorkspaces: boolean;
   isLoading: boolean;
   isError: boolean;
   isVerified: boolean;

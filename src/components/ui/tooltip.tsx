@@ -1,26 +1,15 @@
 'use client';
 
 import * as React from 'react';
+import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Tooltip as TooltipPrimitive } from 'radix-ui';
-import { cn } from '@/lib/utils';
 
-function TooltipProvider({
-  delayDuration = 0,
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
-  return (
-    <TooltipPrimitive.Provider
-      data-slot="tooltip-provider"
-      delayDuration={delayDuration}
-      {...props}
-    />
-  );
+function TooltipProvider({ delayDuration = 0, ...props }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
+  return <TooltipPrimitive.Provider data-slot="tooltip-provider" delayDuration={delayDuration} {...props} />;
 }
 
-function Tooltip({
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Root>) {
+function Tooltip({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
   return (
     <TooltipProvider>
       <TooltipPrimitive.Root data-slot="tooltip" {...props} />
@@ -28,9 +17,7 @@ function Tooltip({
   );
 }
 
-function TooltipTrigger({
-  ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
+function TooltipTrigger({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
 }
 
@@ -39,8 +26,7 @@ const tooltipVariants = cva(
   {
     variants: {
       variant: {
-        light:
-          'border border-border bg-background text-foreground shadow-md shadow-black/5',
+        light: 'border border-border bg-background text-foreground shadow-md shadow-black/5',
         dark: 'dark:border dark:border-border bg-zinc-950 text-white dark:bg-zinc-300 dark:text-black shadow-md shadow-black/5',
       },
     },
@@ -55,8 +41,7 @@ function TooltipContent({
   sideOffset = 4,
   variant,
   ...props
-}: React.ComponentProps<typeof TooltipPrimitive.Content> &
-  VariantProps<typeof tooltipVariants>) {
+}: React.ComponentProps<typeof TooltipPrimitive.Content> & VariantProps<typeof tooltipVariants>) {
   return (
     <TooltipPrimitive.Content
       data-slot="tooltip-content"

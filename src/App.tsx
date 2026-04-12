@@ -1,47 +1,30 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router-dom';
+import { AppRouting } from '@/routing/app-routing';
 import { ThemeProvider } from 'next-themes';
+import { HelmetProvider } from '@packages/react-helmet-async';
+import { BrowserRouter } from 'react-router-dom';
 import { LoadingBarContainer } from 'react-top-loading-bar';
 import { Toaster } from '@/components/ui/sonner';
-import { HelmetProvider } from '@packages/react-helmet-async';
-import { TranslationProvider } from '@/config/i18n/context';
-import { AuthProvider } from '@/providers/auth/auth-provider';
-import { RealtimeProvider } from '@/providers/realtime/realtime-provider';
-import { ChatNavigationProvider } from '@/providers/chat-navigation/chat-navigation-provider';
-import { ModulesProvider } from './providers/modules-provider';
 
-const queryClient = new QueryClient();
 const { BASE_URL } = import.meta.env;
 
-const App = () => (
-    <ThemeProvider
-        attribute="class"
-        defaultTheme="light"
-        storageKey="s22-theme"
-        enableSystem
-        disableTransitionOnChange
-        enableColorScheme
-    >
-        <TranslationProvider>
+export default function App() {
+    return (
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            storageKey="vite-theme"
+            enableSystem
+            disableTransitionOnChange
+            enableColorScheme
+        >
             <HelmetProvider>
                 <LoadingBarContainer>
-                    <QueryClientProvider client={queryClient}>
-                        <BrowserRouter basename={BASE_URL}>
-                            <Toaster />
-                            <AuthProvider>
-                                <RealtimeProvider>
-                                    {/* ChatNavigationProvider needs Router context (useNavigate) */}
-                                    <ChatNavigationProvider>
-                                        <ModulesProvider />
-                                    </ChatNavigationProvider>
-                                </RealtimeProvider>
-                            </AuthProvider>
-                        </BrowserRouter>
-                    </QueryClientProvider>
+                    <BrowserRouter basename={BASE_URL}>
+                        <Toaster />
+                        <AppRouting />
+                    </BrowserRouter>
                 </LoadingBarContainer>
             </HelmetProvider>
-        </TranslationProvider>
-    </ThemeProvider>
-);
-
-export default App;
+        </ThemeProvider>
+    );
+}

@@ -1,130 +1,73 @@
-# Email Builder
+# React + TypeScript + Vite
 
-A drag-and-drop email template builder built with React 18, TypeScript, and Vite.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Stack
+Currently, two official plugins are available:
 
-- **React 18** + **TypeScript** + **Vite**
-- **Tailwind CSS** + **shadcn/ui** (Radix primitives)
-- **dnd-kit** for drag & drop
-- **react-router-dom** v6
-- **@tanstack/react-query**
-- **Vitest** + **@testing-library/react** for tests
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## Getting Started
+## React Compiler
 
-The only requirement is Node.js & npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-```sh
-# Clone the repository
-git clone <YOUR_GIT_URL>
+## Expanding the ESLint configuration
 
-# Navigate to the project directory
-cd <YOUR_PROJECT_NAME>
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-# Install dependencies
-npm i
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-# Start the development server
-npm run dev
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-## Available Scripts
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-| Command | Description |
-|---|---|
-| `npm run dev` | Start dev server with HMR |
-| `npm run build` | Production build |
-| `npm run build:dev` | Development build |
-| `npm run lint` | Run ESLint |
-| `npm run preview` | Preview production build |
-| `npm test` | Run all tests (single pass) |
-| `npm run test:watch` | Run tests in watch mode |
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-## Features
-
-- **Block palette** — Drag or click to add: Heading, Text, Image, Button, Hero, Product Card, Coupon, Survey/Rating, Timer, Video, Divider, Spacer, HTML, Social, IF/ELSE Conditional
-- **Multi-column rows** — 1, 2, or 3 column layouts with drag-and-drop reordering
-- **Inline editing** — Click any text block to edit in place with a floating rich-text toolbar (bold, italic, underline, links, font size/family, lists, alignment, AI rewrite, personalisation variables)
-- **Properties panel** — Full property editing for every block type
-- **Image editor** — Crop, adjust (brightness/contrast/saturation/blur), AI background removal, AI upscale, stock photo browser (Unsplash)
-- **Personalisation** — Insert `{{variable}}` merge tags and IF/ELSE conditional blocks
-- **Undo / Redo** — Full history with Ctrl+Z / Ctrl+Shift+Z
-- **Desktop / Mobile preview toggle**
-- **AI template generation** (mock) and starter templates
-- **Upload HTML** — Import an existing HTML email and parse it into editable blocks
-- **Export** — Download email-safe HTML or copy to clipboard; optional Google Fonts injection
-- **Internationalisation** — English, Russian, Ukrainian, Italian, Spanish, French
-
-## Project Structure
-
-```
-src/
-├── modules/         # Feature-based modules (campaigns, automations, dashboard, etc.)
-├── components/      # Shared components (ui, screen-loader, etc.)
-├── providers/       # Global context providers (modules-provider.tsx)
-├── layout/          # App shell, sidebar, navigation
-├── styles/          # Global styles (index.css)
-├── config/          # Fonts, social networks, personalisation variables, i18n
-├── data/            # Starter email templates
-├── hooks/           # Global/Shared hooks
-├── types/           # All TypeScript types
-└── utils/           # Global utilities
-
-tests/               # Mirror of src/ structure; run with Vitest
-```
-
-## Configuration
-
-### Unsplash Stock Photos
-
-Add your free Unsplash API key to `.env` to enable live search:
-
-```
-VITE_UNSPLASH_ACCESS_KEY=your_key_here
-```
-
-Get a free key at <https://unsplash.com/developers>. Without a key, a curated library of 20 images is shown.
-
-### Image Storage
-
-By default, edited images are stored as base64 data URIs. To switch to a server upload, edit `src/config/image-storage.ts`:
-
-```ts
-export const IMAGE_STORAGE_CONFIG: ImageStorageConfig = {
-    driver: 'server',
-    serverEndpoint: 'https://your-upload-endpoint.com/upload',
-};
-```
-
-### Adding a New Block Type
-
-See the step-by-step guide in [`AGENTS.md`](./AGENTS.md#adding-a-new-block-type).
-
-### Adding a New Social Network
-
-Append one entry to `SOCIAL_NETWORK_CONFIG` in `src/config/social-networks.ts` — no other files need changing. See [`AGENTS.md`](./AGENTS.md#adding-a-new-social-network).
-
-### Adding a New Language
-
-See [`AGENTS.md`](./AGENTS.md#adding-a-new-language).
-
-## Testing
-
-Tests live in `tests/` and mirror the `src/` structure.
-
-```sh
-npm test          # single run
-npm run test:watch  # watch mode
-```
-
-Coverage areas include utility functions (`parseHtml`, `exportHtml`, AI mocks), hooks (`useEmailBuilder`, `useBlockOps`, `useTemplateHistory`), inline editor helpers (positioning, formatting, toolbar state, keyboard handling), and component-level tests (block renderers, modals, context menus).
-
-## Deployment
-
-Build the project and serve the `dist/` folder from any static host:
-
-```sh
-npm run build
-# then upload dist/ to your host of choice
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```

@@ -1,20 +1,21 @@
 import { type LucideIcon } from 'lucide-react';
 
-export interface NavItem {
-    id: string;
-    title?: string;
-    icon?: LucideIcon;
-    path?: string;
-    badge?: string;
-    pinnable?: boolean;
-    pinned?: boolean;
-    soon?: boolean;
-    new?: {
-        tooltip: string;
-        path: string;
-    };
-    more?: true;
-    dropdown?: true;
+export interface MenuItem {
+  title?: string;
+  desc?: string;
+  img?: string;
+  icon?: LucideIcon;
+  path?: string;
+  rootPath?: string;
+  childrenIndex?: number;
+  heading?: string;
+  children?: MenuConfig;
+  disabled?: boolean;
+  collapse?: boolean;
+  collapseTitle?: string;
+  expandTitle?: string;
+  badge?: string;
+  separator?: boolean;
 }
 
-export type NavConfig = NavItem[];
+export type MenuConfig = MenuItem[];

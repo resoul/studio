@@ -1,6 +1,11 @@
+/* Tailwind Core */
 @import 'tailwindcss';
 @import 'tw-animate-css';
+
+/** Dark Mode Variant **/
 @custom-variant dark (&:is(.dark *));
+
+/** Colors - https://tailwindcss.com/docs/colors **/
 :root {
     --background: var(--color-white);
     --foreground: var(--color-zinc-950);
@@ -8,7 +13,7 @@
     --card-foreground: var(--color-zinc-950);
     --popover: var(--color-white);
     --popover-foreground: var(--color-zinc-950);
-    --primary: var(--color-blue-500);
+    --primary: var(--color-zinc-900);
     --primary-foreground: var(--color-white);
     --secondary: var(--color-zinc-100);
     --secondary-foreground: var(--color-zinc-900);
@@ -23,13 +28,12 @@
     --chart-3: var(--color-yellow-500);
     --chart-4: var(--color-red-500);
     --chart-5: var(--color-purple-500);
-    --border: oklch(
-            94% 0.004 286.32
-    ); /* between --color-zinc-100 and --color-zinc-200 */
+    --border: oklch(94% 0.004 286.32); /* between --color-zinc-100 and --color-zinc-200 */
     --input: var(--color-zinc-200);
     --ring: var(--color-zinc-400);
     --radius: 0.5rem;
 }
+
 .dark {
     --background: var(--color-zinc-950);
     --foreground: var(--color-zinc-50);
@@ -37,8 +41,8 @@
     --card-foreground: var(--color-zinc-50);
     --popover: var(--color-zinc-950);
     --popover-foreground: var(--color-zinc-50);
-    --primary: var(--color-blue-600);
-    --primary-foreground: var(--color-white);
+    --primary: var(--color-zinc-300);
+    --primary-foreground: var(--color-zinc-950);
     --secondary: var(--color-zinc-800);
     --secondary-foreground: var(--color-zinc-50);
     --muted: var(--color-zinc-900);
@@ -56,6 +60,8 @@
     --input: var(--color-zinc-800);
     --ring: var(--color-zinc-600);
 }
+
+/** Theme Setup **/
 @theme inline {
     /** Base Colors **/
     --color-background: var(--background);
@@ -105,6 +111,8 @@
         }
     }
 }
+
+/** Global Styles **/
 @layer base {
     * {
         @apply border-border;
@@ -114,6 +122,8 @@
         @apply outline-ring rounded-xs shadow-none outline-2 outline-offset-3 transition-none!;
     }
 }
+
+/** Custom Scrollbar **/
 @layer base {
     ::-webkit-scrollbar {
         width: 5px;
@@ -130,27 +140,21 @@
         scrollbar-color: var(--input) transparent;
     }
 }
+
+/** Smooth scroll **/
 html {
     scroll-behavior: smooth;
 }
+
+/** Custom Containers **/
 @utility container {
     @apply mx-auto max-w-none px-4 lg:px-5;
 
     @media (width >= --theme(--breakpoint-xl)) {
-        @apply max-w-(--breakpoint-xl);
-    }
+    @apply max-w-(--breakpoint-xl);
+}
 }
 
 @utility container-fluid {
-    @apply mx-auto w-full px-4 lg:px-5;
-}
-@custom-variant light (&:not(.dark *));
-@theme {
-    --text-2sm: 0.8125rem;
-    --text-2sm--line-height: calc(1.075 / 0.8125);
-    --text-2xs: 0.6875rem;
-    --text-2xs--line-height: calc(0.825 / 0.6875);
-}
-[data-slot=card-title] {
-    @apply font-medium;
+    @apply w-full mx-auto px-4 lg:px-5;
 }

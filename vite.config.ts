@@ -20,7 +20,7 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/auth\/v1/, ''),
       },
-      '/api/v1': {
+      '/api': {
         target: 'http://api:8080',
         changeOrigin: true,
       },

@@ -6,12 +6,12 @@ export function Error404() {
     <>
       <div className="mb-10">
         <img
-          src={toAbsoluteUrl('/media/illustrations/19.svg')}
+          src={toAbsoluteUrl('/19.svg')}
           className="dark:hidden max-h-[160px]"
           alt="image"
         />
         <img
-          src={toAbsoluteUrl('/media/illustrations/19-dark.svg')}
+          src={toAbsoluteUrl('/19-dark.svg')}
           className="hidden dark:block max-h-[160px]"
           alt="image"
         />

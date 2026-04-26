@@ -1,14 +1,36 @@
 <!doctype html>
-<html lang="en">
+<html class="h-full" lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/media/app/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <title>Studio</title>
+      <link
+              rel="stylesheet"
+              href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700"
+      />
+      <style>
+          .dark body {
+              background-color: hsl(240 10% 4%);
+          }
+      </style>
+      <script>
+          (function () {
+              try {
+                  const theme = localStorage.getItem('theme') || 'system';
+                  const prefersDark = window.matchMedia(
+                      '(prefers-color-scheme: dark)',
+                  ).matches;
+                  const isDarkMode =
+                      theme === 'dark' || (theme === 'system' && prefersDark);
+                  if (isDarkMode) document.documentElement.classList.add('dark');
+              } catch (e) {}
+          })();
+      </script>
   </head>
-  <body>
-    <div id="root"></div>
+  <body class="text-foreground bg-background flex h-full text-base antialiased">
+  <div class="flex grow" id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
